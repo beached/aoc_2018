@@ -3,6 +3,8 @@ project( aoc_2018 )
 
 set(CMAKE_CXX_STANDARD 17)
 
+find_package( Boost 1.58.0 COMPONENTS system iostreams filesystem regex unit_test_framework REQUIRED )
+
 if( ${CMAKE_CXX_COMPILER_ID} STREQUAL 'MSVC' )
 	add_definitions( -DNOMINMAX -DD_WIN32_WINNT=0x0601 )
 	add_compile_options( /W2 )
@@ -32,6 +34,10 @@ set( SOURCE_FOLDER "src" )
 set( TEST_FOLDER "tests" )
 
 include_directories( ${HEADER_FOLDER} )
+
+include_directories( SYSTEM ${Boost_INCLUDE_DIRS} )
+link_directories( ${Boost_LIBRARY_DIRS} )
+add_definitions( -DBOOST_TEST_DYN_LINK -DBOOST_ALL_NO_LIB -DBOOST_ALL_DYN_LINK )
 
 set( HEADER_FILES
 	${HEADER_FOLDER}/day_01.h
