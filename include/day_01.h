@@ -22,8 +22,33 @@
 
 #pragma once
 
-namespace daw {
+#include <cstdint>
+#include <unordered_map>
+#include <vector>
 
+#include <daw/daw_algorithm.h>
+
+namespace daw {
+	constexpr intmax_t sum_values( std::initializer_list<intmax_t> values ) {
+		return daw::algorithm::accumulate( values.begin( ), values.end( ), static_cast<intmax_t>( 0 ) );
+	}
+
+	template<typename Container>
+	intmax_t find_dups( Container && values ) {
+		std::unordered_map<intmax_t, size_t> sum_count{};
+		intmax_t sum = 0;
+		sum_count[sum] = 1;
+		while( true ) {
+			for (auto i: values) {
+				sum += i;
+				if (sum_count[sum] > 0) {
+					return sum;
+				}
+				++sum_count[sum];
+			}
+		}
+		throw std::exception{};
+	}
 }
 
 
