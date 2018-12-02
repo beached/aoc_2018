@@ -23,31 +23,75 @@
 #pragma once
 
 #include <cstdint>
-#include <optional>
-#include <unordered_set>
+#include <string>
+#include <unordered_map>
 
 #include <daw/daw_algorithm.h>
 #include <daw/daw_traits.h>
 
 namespace daw {
-	constexpr intmax_t sum_values( std::initializer_list<intmax_t> values ) {
-		return daw::algorithm::accumulate( values.begin( ), values.end( ),
-		                                   static_cast<intmax_t>( 0 ) );
+	template<typename Iterator>
+	constexpr size_t count_len( Iterator first, Iterator last ) {
+		size_t result = 1;
+		auto pos = first++;
+		while( pos != last && *pos == *first ) {
+			++result;
+		}
+		return result;
 	}
 
+
 	template<typename Container>
-	intmax_t find_dups( Container &&values ) {
-		std::unordered_set<intmax_t> sums{};
-		intmax_t sum = 0;
-		sums.insert( sum );
-		while( true ) {
-			for( auto i : values ) {
-				sum += i;
-				if( sums.count( sum ) > 0 ) {
-					return sum;
+	size_t get_checksum( Container && ids ) {
+		size_t two_of_same = 0;
+		size_t three_of_same = 0;
+
+		for( auto id: ids ) {
+			std::unordered_map<char, size_t> counts{};
+			for( auto c: id ) {
+				++counts[c];
+			}
+			bool has_two = false;
+			bool has_three = false;
+
+			for( auto const & kv: counts ) {
+				switch( kv.second ) {
+					case 2:
+						has_two = true;
+						break;
+					case 3:
+						has_three = true;
+						break;
 				}
-				sums.insert( sum );
+			}
+			if( has_two ) { ++two_of_same; }
+			if( has_three ) { ++three_of_same; }
+		}
+		return two_of_same * three_of_same;
+	}
+
+
+	template<typename Container>
+	std::string get_match( Container && ids ) {
+		std::string result{};
+		for( size_t n=0; n<ids.size( ); ++n ) {
+			for( size_t m=n+1; m<ids.size( ); ++m ) {
+				uint_fast8_t sum = 0;
+				result = "";
+				for( size_t pos = 0; pos < ids[n].size( ); ++pos ) {
+					if( ids[n][pos] != ids[m][pos] ) {
+						if( ++sum > 1 ) {
+							break;
+						}
+						result = ids[n];
+						result.erase( pos, 1 );
+					}
+				}
+				if( sum == 1 ) {
+					return result;
+				}
 			}
 		}
+		std::terminate( );
 	}
 } // namespace daw
