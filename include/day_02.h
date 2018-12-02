@@ -45,17 +45,16 @@ namespace daw {
 	size_t get_checksum( Container && ids ) {
 		size_t two_of_same = 0;
 		size_t three_of_same = 0;
-
 		for( auto id: ids ) {
-			std::unordered_map<char, size_t> counts{};
+			std::array<uint8_t, 26> counts{};
 			for( auto c: id ) {
-				++counts[c];
+				++counts[static_cast<uint8_t>(c - 'a')];
 			}
 			bool has_two = false;
 			bool has_three = false;
 
-			for( auto const & kv: counts ) {
-				switch( kv.second ) {
+			for( auto const & c: counts ) {
+				switch( c ) {
 					case 2:
 						has_two = true;
 						break;
