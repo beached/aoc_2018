@@ -98,10 +98,10 @@ namespace daw {
 		fabric_t<1000, 1000> fabric{};
 		uint32_t conflict_area = 0;
 
-		for( auto const &req : requests ) {
+		for( auto const req : requests ) {
 			for( auto x = req.left; x < ( req.left + req.width ); ++x ) {
 				for( auto y = req.top; y < ( req.top + req.height ); ++y ) {
-					if( ++fabric( x, y ) == 2 ) {
+					if( ++fabric( x, y ) == 2U ) {
 						++conflict_area;
 					}
 				}
@@ -121,11 +121,11 @@ namespace daw {
 		// Assume req id's match size, if not grow later
 		result.conflicts.resize( std::size( requests ) + 1, false );
 
-		for( auto const &req : requests ) {
+		for( auto const req : requests ) {
 			for( auto x = req.left; x < ( req.left + req.width ); ++x ) {
 				for( auto y = req.top; y < ( req.top + req.height ); ++y ) {
 					++result.fabric( x, y );
-					if( result.fabric( x, y ) > 1 ) {
+					if( result.fabric( x, y ) > 1U ) {
 						result.conflicts[req.id] = true;
 					}
 				}
@@ -137,15 +137,15 @@ namespace daw {
 	constexpr void do_nothing( ) noexcept {}
 	template<typename Container>
 	uint16_t find_unconflicted_area( Container &&reqs ) {
-		auto result = apply_reqs_to_fabric( reqs );
+		auto const result = apply_reqs_to_fabric( reqs );
 
-		for( auto const &req : reqs ) {
+		for( request_t const req : reqs ) {
 			if( result.conflicts[req.id] ) {
 				continue;
 			}
 			for( auto x = req.left; x < ( req.left + req.width ); ++x ) {
 				for( auto y = req.top; y < ( req.top + req.height ); ++y ) {
-					if( result.fabric( x, y ) != 1 ) {
+					if( result.fabric( x, y ) != 1U ) {
 						goto notfound;
 					}
 				}
@@ -156,5 +156,4 @@ namespace daw {
 		}
 		std::terminate( );
 	}
-
 } // namespace daw
