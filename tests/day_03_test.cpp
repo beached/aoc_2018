@@ -715,42 +715,63 @@ namespace daw {
 			};
 
 			template<typename T, typename U>
-			constexpr void expecting( T && expected_result, U && result ) noexcept {
+			constexpr void expecting( T &&expected_result, U &&result ) noexcept {
 				if( expected_result != result ) {
-					std::cerr << "Invalid result. Expecting '" << expected_result << "' but got '" << result << "'\n";
+					std::cerr << "Invalid result. Expecting '" << expected_result
+					          << "' but got '" << result << "'\n";
 					std::terminate( );
 				}
 			}
 
-		void day_03_part_1( ) {
+			double day_03_part_1( ) {
 				std::optional<uint32_t> result{};
 				daw::do_not_optimize( request_strs );
 				auto const requests = parse_request( request_strs );
-				daw::bench_test( "Day 3, Part 1", [&]( ) {
+				auto t = daw::benchmark( [&]( ) {
 					result = calc_conflicted_area( requests );
 				} );
 				daw::do_not_optimize( *result );
 				expecting( 115242U, *result );
+				return t;
 			}
 
-			void day_03_part_2( ) {
+			double day_03_part_2( ) {
 				std::optional<uint16_t> result{};
 				daw::do_not_optimize( request_strs );
 				auto const requests = parse_request( request_strs );
-				daw::bench_test( "Day 3, Part 2", [&]( ) {
+				auto t = daw::benchmark( [&]( ) {
 					result = find_unconflicted_area( requests );
 				} );
 				expecting( 1046U, *result );
+				return t;
 			}
 		} // namespace day03
 	}   // namespace aoc_2018
 } // namespace daw
 
 int main( ) {
-	daw::aoc_2018::day03::day_03_part_1( );
-	daw::aoc_2018::day03::day_03_part_2( );
-	daw::aoc_2018::day03::day_03_part_1( );
-	daw::aoc_2018::day03::day_03_part_2( );
-	daw::aoc_2018::day03::day_03_part_1( );
-	daw::aoc_2018::day03::day_03_part_2( );
+	constexpr size_t count = 1'000;
+	double t = 0.0;
+	double t_min = std::numeric_limits<double>::max( );
+	for( size_t n=0; n<count; ++n ) {
+		auto tmp = daw::aoc_2018::day03::day_03_part_1();
+		if( tmp < t_min ) {
+			t_min = tmp;
+		}
+		t += tmp;
+	}
+	t /= static_cast<double>( count );
+	std::cout << "Day 3, part 1 avg(" << daw::utility::format_seconds( t, 2 ) << ") min(" << daw::utility::format_seconds( t_min, 2 ) << ")\n";
+	t = 0.0;
+	t_min = std::numeric_limits<double>::max( );
+	for( size_t n=0; n<count; ++n ) {
+			auto tmp = daw::aoc_2018::day03::day_03_part_2();
+		if( tmp < t_min ) {
+			t_min = tmp;
+		}
+		t += tmp;
+	}
+	t /= static_cast<double>( count );
+	std::cout << "Day 3, part 2 avg(" << daw::utility::format_seconds( t, 2 ) << ") min(" << daw::utility::format_seconds( t_min, 2 ) << ")\n";
+	t = 0.0;
 }
