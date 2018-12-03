@@ -20,25 +20,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#define BOOST_TEST_MODULE aoc_2018_day_03
-#include <daw/boost_test.h>
+#include "day_03.h"
 
-#include <array>
-#include <cstdint>
-#include <cstdlib>
-#include <iostream>
-#include <string>
-#include <vector>
-
-#include <daw/daw_benchmark.h>
-
-#include "day_02.h"
-
-namespace daw {
-	namespace aoc_2018 {
-		namespace day03 {
-			using namespace std::string_literals;
-
-		} // namespace day03
-	}   // namespace aoc_2018
-} // namespace daw
+namespace daw {}

@@ -22,8 +22,10 @@
 
 #pragma once
 
+#include <algorithm>
 #include <cstdint>
 #include <string>
+#include <string_view>
 #include <unordered_map>
 
 #include <daw/daw_algorithm.h>
@@ -40,46 +42,49 @@ namespace daw {
 		return result;
 	}
 
-
 	template<typename Container>
-	size_t get_checksum( Container && ids ) {
+	size_t get_checksum( Container &&ids ) {
 		size_t two_of_same = 0;
 		size_t three_of_same = 0;
-		for( auto id: ids ) {
+		for( auto id : ids ) {
 			std::array<uint8_t, 26> counts{};
-			for( auto c: id ) {
-				++counts[static_cast<uint8_t>(c - 'a')];
+			for( auto c : id ) {
+				++counts[static_cast<uint8_t>( c - 'a' )];
 			}
 			bool has_two = false;
 			bool has_three = false;
 
-			for( auto const & c: counts ) {
+			for( auto const &c : counts ) {
 				switch( c ) {
-					case 2:
-						has_two = true;
-						break;
-					case 3:
-						has_three = true;
-						break;
+				case 2:
+					has_two = true;
+					break;
+				case 3:
+					has_three = true;
+					break;
 				}
 			}
-			if( has_two ) { ++two_of_same; }
-			if( has_three ) { ++three_of_same; }
+			if( has_two ) {
+				++two_of_same;
+			}
+			if( has_three ) {
+				++three_of_same;
+			}
 		}
 		return two_of_same * three_of_same;
 	}
 
-
 	template<typename Container>
-	std::string get_match( Container && ids ) {
+	std::string get_match( Container &&ids ) {
 		std::string result{};
-		for( size_t n=0; n<ids.size( ); ++n ) {
-			for( size_t m=n+1; m<ids.size( ); ++m ) {
+		for( size_t n = 0; n < ids.size( ); ++n ) {
+			for( size_t m = n + 1; m < ids.size( ); ++m ) {
 				uint_fast8_t sum = 0;
 				result = "";
 				for( size_t pos = 0; pos < ids[n].size( ); ++pos ) {
 					if( ids[n][pos] != ids[m][pos] ) {
-						if( ++sum > 1 ) {
+						++sum;
+						if( sum > 1 ) {
 							break;
 						}
 						result = ids[n];
@@ -92,5 +97,31 @@ namespace daw {
 			}
 		}
 		std::terminate( );
+	}
+
+	template<typename String>
+	constexpr intmax_t sum_string( String &&str ) {
+		return daw::algorithm::accumulate(
+		  begin( str ), end( str ), static_cast<intmax_t>( 0 ),
+		  []( auto init, auto c ) { return init + ( c - 'a' + 1 ); } );
+	}
+
+	template<typename Container>
+	auto get_container_info( Container &&c ) {
+		struct info_t {
+			size_t index;
+			intmax_t sum;
+		};
+		std::vector<info_t> value_info{};
+		value_info.reserve( std::size( c ) );
+		size_t idx = 0;
+		std::transform(
+		  begin( c ), end( c ), std::back_inserter( value_info ),
+		  [&idx]( auto &&v ) {
+			  return info_t{idx++, sum_string( std::forward<decltype( v )>( v ) )};
+		  } );
+		std::sort( begin( value_info ), end( value_info ),
+		           []( auto &&lhs, auto &&rhs ) { return lhs.sum < rhs.sum; } );
+		return value_info;
 	}
 } // namespace daw

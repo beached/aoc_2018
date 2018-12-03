@@ -20,6 +20,17 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "day_02.h"
+#pragma once
 
-namespace daw {}
+#include <algorithm>
+#include <cstdint>
+#include <string>
+#include <string_view>
+#include <unordered_map>
+
+#include <daw/daw_algorithm.h>
+#include <daw/daw_traits.h>
+
+namespace daw {
+
+} // namespace daw

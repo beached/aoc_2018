@@ -44,7 +44,7 @@ set( HEADER_FILES
 )
 
 set( SOURCE_FILES
-	${SOURCE_FOLDER}/day_02.cpp
+	${SOURCE_FOLDER}/day_03.cpp
 )
 
 #add_library ( aoc_2018_lib STATIC ${HEADER_FILES} ${SOURCE_FILES} )
@@ -55,4 +55,7 @@ target_link_libraries( day_01_test ${Boost_LIBRARIES} ${CMAKE_DL_LIBS} ${COMPILE
 
 add_executable( day_02_test ${HEADER_FILES} ${TEST_FOLDER}/day_02_test.cpp )
 target_link_libraries( day_02_test ${Boost_LIBRARIES} ${CMAKE_DL_LIBS} ${COMPILER_SPECIFIC_LIBS} ${CMAKE_THREAD_LIBS_INIT} )
+
+add_executable( day_03_test ${HEADER_FILES} ${TEST_FOLDER}/day_03_test.cpp )
+target_link_libraries( day_03_test ${Boost_LIBRARIES} ${CMAKE_DL_LIBS} ${COMPILER_SPECIFIC_LIBS} ${CMAKE_THREAD_LIBS_INIT} )
 
