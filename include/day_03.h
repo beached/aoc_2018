@@ -101,8 +101,7 @@ namespace daw {
 		for( auto const &req : requests ) {
 			for( auto x = req.left; x < ( req.left + req.width ); ++x ) {
 				for( auto y = req.top; y < ( req.top + req.height ); ++y ) {
-					++fabric( x, y );
-					if( fabric( x, y ) == 2 ) {
+					if( ++fabric( x, y ) == 2 ) {
 						++conflict_area;
 					}
 				}
