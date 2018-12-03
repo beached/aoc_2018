@@ -116,18 +116,14 @@ namespace daw {
 			return conflict_area;
 		}
 
-		template<typename Container>
-		auto apply_reqs_to_fabric( Container &&requests ) {
-			struct result_t {
+		template<size_t N>
+		constexpr auto apply_reqs_to_fabric( std::array<request_t, N> const & requests ) {
+			struct {
 				fabric_t<1000, 1000> fabric{};
-				std::vector<bool> conflicts{};
-			};
+				std::array<bool, N> conflicts{};
+			} result{};
 
-			result_t result{};
-			// Assume req id's match size, if not grow later
-			result.conflicts.resize( std::size( requests ) + 1, false );
-
-			for( size_t id=0; id < std::size( requests ); ++id ) {
+			for( size_t id=0; id < N; ++id ) {
 				auto const & req = requests[id];
 				for( auto x = req.left; x < ( req.left + req.width ); ++x ) {
 					for( auto y = req.top; y < ( req.top + req.height ); ++y ) {
@@ -169,7 +165,7 @@ namespace daw {
 		}
 
 		template<typename Container>
-		uint16_t find_unconflicted_area( Container &&reqs ) {
+		constexpr uint16_t find_unconflicted_area( Container &&reqs ) {
 			auto const result = apply_reqs_to_fabric( reqs );
 
 			for( request_t const req : reqs ) {
