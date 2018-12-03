@@ -36,7 +36,7 @@ namespace daw {
 		namespace day03 {
 			using namespace std::string_literals;
 
-			static std::array<std::string, 1349> request_strs = {
+			static std::array<std::string, 1349> const request_strs = {
 			  "#1 @ 286,440: 19x24"s,    "#2 @ 430,120: 20x14"s,
 			  "#3 @ 250,746: 20x17"s,    "#4 @ 639,255: 28x28"s,
 			  "#5 @ 793,21: 23x10"s,     "#6 @ 835,164: 25x11"s,
@@ -715,7 +715,7 @@ namespace daw {
 			};
 
 			template<typename T, typename U>
-			void expecting( T && expected_result, U && result ) noexcept {
+			constexpr void expecting( T && expected_result, U && result ) noexcept {
 				if( expected_result != result ) {
 					std::cerr << "Invalid result. Expecting '" << expected_result << "' but got '" << result << "'\n";
 					std::terminate( );
@@ -747,6 +747,10 @@ namespace daw {
 } // namespace daw
 
 int main( ) {
+	daw::aoc_2018::day03::day_03_part_1( );
+	daw::aoc_2018::day03::day_03_part_2( );
+	daw::aoc_2018::day03::day_03_part_1( );
+	daw::aoc_2018::day03::day_03_part_2( );
 	daw::aoc_2018::day03::day_03_part_1( );
 	daw::aoc_2018::day03::day_03_part_2( );
 }

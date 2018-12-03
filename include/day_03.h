@@ -69,24 +69,21 @@ namespace daw {
 
 	template<uint16_t width, uint16_t height>
 	class fabric_t {
-		static_assert( width > 0 );
-		static_assert( height > 0 );
-
 		static inline constexpr size_t const m_size =
 		  static_cast<size_t>( width * height );
 
-		std::vector<uint16_t> m_values = std::vector<uint16_t>( m_size, 0 );
-
+		std::array<uint16_t, m_size> m_values{};
 	public:
+		using size_type = uint16_t;
 		fabric_t( ) = default;
 
-		uint16_t &operator( )( uint16_t x, uint16_t y ) noexcept {
+		auto &operator( )( size_type x, size_type y ) noexcept {
 			return m_values[static_cast<size_t>( x ) +
 			                ( static_cast<size_t>( y ) *
 			                  static_cast<size_t>( width ) )];
 		}
 
-		uint16_t const &operator( )( int16_t x, int16_t y ) const noexcept {
+		auto const &operator( )( size_type x, size_type y ) const noexcept {
 			return m_values[static_cast<size_t>( x ) +
 			                ( static_cast<size_t>( y ) *
 			                  static_cast<size_t>( width ) )];
@@ -157,3 +154,4 @@ namespace daw {
 		std::terminate( );
 	}
 } // namespace daw
+
