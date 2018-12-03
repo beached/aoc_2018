@@ -36,7 +36,7 @@
 namespace daw {
 	namespace {
 		struct request_t {
-			uint16_t id;
+			//uint16_t id;
 			uint16_t left;
 			uint16_t top;
 			uint16_t width;
@@ -51,7 +51,7 @@ namespace daw {
 				sv.remove_prefix( );
 				request_t tmp{};
 				auto sv_tmp = sv.pop_front( sv.find_first_of( ' ' ) );
-				tmp.id = daw::parser::parse_int<uint16_t>( sv_tmp );
+				daw::parser::parse_int<uint16_t>( sv_tmp );
 				sv.remove_prefix( sv.find_first_of( '@' ) + 2 );
 				sv_tmp = sv.pop_front( sv.find_first_of( ',' ) );
 				tmp.left = daw::parser::parse_int<uint16_t>( sv_tmp );
@@ -126,12 +126,13 @@ namespace daw {
 			// Assume req id's match size, if not grow later
 			result.conflicts.resize( std::size( requests ) + 1, false );
 
-			for( auto const req : requests ) {
+			for( size_t id=0; id < std::size( requests ); ++id ) {
+				auto const & req = requests[id];
 				for( auto x = req.left; x < ( req.left + req.width ); ++x ) {
 					for( auto y = req.top; y < ( req.top + req.height ); ++y ) {
 						++result.fabric( x, y );
 						if( result.fabric( x, y ) > 1U ) {
-							result.conflicts[req.id] = true;
+							result.conflicts[id+1] = true;
 						}
 					}
 				}
