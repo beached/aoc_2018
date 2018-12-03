@@ -717,13 +717,25 @@ namespace daw {
 			  "#1349 @ 979,160: 19x17"s,
 			};
 
-			intmax_t find_conflicted_area( ) {
-				return calc_conflicted_area( p1_requests );
+			BOOST_AUTO_TEST_CASE( day_03_part_1 ) {
+				std::optional<intmax_t> result{};
+				daw::do_not_optimize( p1_requests );
+				auto const requests = parse_request( p1_requests );
+				daw::bench_test( "Day 3, Part 1", [&]( ) {
+					result = calc_conflicted_area( requests );
+				} );
+				daw::do_not_optimize( *result );
+				BOOST_REQUIRE_EQUAL( *result, 115242 );
 			}
 
-			BOOST_AUTO_TEST_CASE( day_03_part_1 ) {
-				auto result = find_conflicted_area( );
-				BOOST_REQUIRE_EQUAL( result, 115242 );
+			BOOST_AUTO_TEST_CASE( day_03_part_2 ) {
+				std::optional<size_t> result{};
+				daw::do_not_optimize( p1_requests );
+				auto const requests = parse_request( p1_requests );
+				daw::bench_test( "Day 3, Part 2", [&]( ) {
+					result = find_unconflicted_area( requests );
+				} );
+				BOOST_REQUIRE_EQUAL( *result, 1046 );
 			}
 		} // namespace day03
 	}   // namespace aoc_2018
