@@ -36,7 +36,7 @@ namespace daw {
 		namespace day03 {
 			using namespace daw::string_view_literals;
 
-			constexpr static auto const requests = parse_request( std::array<daw::string_view, 1349> {
+			static auto requests = parse_request( std::array<daw::string_view, 1349> {
 			  "#1 @ 286,440: 19x24"_sv,    "#2 @ 430,120: 20x14"_sv,
 			  "#3 @ 250,746: 20x17"_sv,    "#4 @ 639,255: 28x28"_sv,
 			  "#5 @ 793,21: 23x10"_sv,     "#6 @ 835,164: 25x11"_sv,
