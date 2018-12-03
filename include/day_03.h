@@ -36,22 +36,23 @@
 namespace daw {
 	namespace {
 		struct request_t {
-			//uint16_t id;
+			uint16_t id;
 			uint16_t left;
 			uint16_t top;
 			uint16_t width;
 			uint16_t height;
 		};
 
-		template<typename Container>
-		std::vector<request_t> parse_request( Container &&requests ) {
-			std::vector<request_t> result{};
-			for( daw::string_view sv : requests ) {
+		template<size_t N>
+		constexpr std::array<request_t, N> parse_request( std::array<daw::string_view, N> const & requests ) noexcept {
+			std::array<request_t, N> result{};
+			for( size_t idx = 0; idx < N; ++idx ) {
+				auto sv = requests[idx];
 				// format: #123 @ 3,2: 5x4
 				sv.remove_prefix( );
 				request_t tmp{};
 				auto sv_tmp = sv.pop_front( sv.find_first_of( ' ' ) );
-				daw::parser::parse_int<uint16_t>( sv_tmp );
+				tmp.id = daw::parser::parse_int<uint16_t>( sv_tmp );
 				sv.remove_prefix( sv.find_first_of( '@' ) + 2 );
 				sv_tmp = sv.pop_front( sv.find_first_of( ',' ) );
 				tmp.left = daw::parser::parse_int<uint16_t>( sv_tmp );
@@ -63,7 +64,7 @@ namespace daw {
 				tmp.width = daw::parser::parse_int<uint16_t>( sv_tmp );
 				sv.remove_prefix( );
 				tmp.height = daw::parser::parse_int<uint16_t>( sv );
-				result.push_back( tmp );
+				result[idx] = tmp;
 			}
 			return result;
 		}
@@ -78,7 +79,7 @@ namespace daw {
 		public:
 			using size_type = uint16_t;
 
-			fabric_t( ) = default;
+			constexpr fabric_t( ) = default;
 
 			constexpr auto &operator( )( size_type x, size_type y ) noexcept {
 				return m_values[static_cast<size_t>( x ) +
@@ -99,7 +100,7 @@ namespace daw {
 		};
 
 		template<typename Container>
-		uint32_t calc_conflicted_area( Container &&requests ) {
+		constexpr uint32_t calc_conflicted_area( Container &&requests ) {
 			fabric_t<1000, 1000> fabric{};
 			uint32_t conflict_area = 0;
 
