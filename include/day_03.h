@@ -150,7 +150,7 @@ namespace daw {
 	uint16_t find_unconflicted_area( Container &&reqs ) {
 		auto const result = apply_reqs_to_fabric( reqs );
 
-		for( request_t const & req : reqs ) {
+		for( request_t const req : reqs ) {
 			if( result.conflicts[req.id] ) {
 				continue;
 			}
