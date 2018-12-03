@@ -73,6 +73,7 @@ namespace daw {
 		  static_cast<size_t>( width * height );
 
 		std::array<uint16_t, m_size> m_values{};
+
 	public:
 		using size_type = uint16_t;
 		fabric_t( ) = default;
@@ -131,27 +132,33 @@ namespace daw {
 		return result;
 	}
 
+	template<typename Request, typename Fabric>
+	constexpr bool is_conflict_free( Request &&req, Fabric &&fabric ) noexcept {
+		for( auto x = req.left; x < ( req.left + req.width ); ++x ) {
+			for( auto y = req.top; y < ( req.top + req.height ); ++y ) {
+				if( fabric( x, y ) != 1U ) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
 	constexpr void do_nothing( ) noexcept {}
+
 	template<typename Container>
 	uint16_t find_unconflicted_area( Container &&reqs ) {
 		auto const result = apply_reqs_to_fabric( reqs );
 
-		for( request_t const req : reqs ) {
+		for( request_t const & req : reqs ) {
 			if( result.conflicts[req.id] ) {
 				continue;
 			}
-			for( auto x = req.left; x < ( req.left + req.width ); ++x ) {
-				for( auto y = req.top; y < ( req.top + req.height ); ++y ) {
-					if( result.fabric( x, y ) != 1U ) {
-						goto notfound;
-					}
-				}
+			if( is_conflict_free( req, result.fabric ) ) {
+				return req.id;
 			}
-			return req.id;
-		notfound:
-			do_nothing( );
 		}
 		std::terminate( );
-	}
+	} // namespace daw
 } // namespace daw
 
