@@ -78,16 +78,20 @@ namespace daw {
 		using size_type = uint16_t;
 		fabric_t( ) = default;
 
-		auto &operator( )( size_type x, size_type y ) noexcept {
+		constexpr auto &operator( )( size_type x, size_type y ) noexcept {
 			return m_values[static_cast<size_t>( x ) +
 			                ( static_cast<size_t>( y ) *
 			                  static_cast<size_t>( width ) )];
 		}
 
-		auto const &operator( )( size_type x, size_type y ) const noexcept {
+		constexpr auto const &operator( )( size_type x, size_type y ) const noexcept {
 			return m_values[static_cast<size_t>( x ) +
 			                ( static_cast<size_t>( y ) *
 			                  static_cast<size_t>( width ) )];
+		}
+
+		constexpr bool is_conflicted( size_type x, size_type y ) const noexcept {
+			return operator( )( x, y ) > 1;
 		}
 	};
 
@@ -133,9 +137,12 @@ namespace daw {
 	}
 
 	template<typename Request, typename Fabric>
-	constexpr bool is_conflict_free( Request &&req, Fabric &&fabric ) noexcept {
-		for( auto x = req.left; x < ( req.left + req.width ); ++x ) {
-			for( auto y = req.top; y < ( req.top + req.height ); ++y ) {
+	constexpr bool is_conflict_free_old( Request &&req,
+	                                     Fabric &&fabric ) noexcept {
+		auto const max_x = req.left + req.width;
+		auto const max_y = req.top + req.height;
+		for( auto x = req.left; x < max_x; ++x ) {
+			for( auto y = req.top; y < max_y; ++y ) {
 				if( fabric( x, y ) != 1U ) {
 					return false;
 				}
@@ -144,7 +151,31 @@ namespace daw {
 		return true;
 	}
 
-	constexpr void do_nothing( ) noexcept {}
+	template<typename Request, typename Fabric>
+	constexpr bool is_conflict_free( Request &&req,
+	                                     Fabric &&fabric ) noexcept {
+		uint16_t const max_x = req.left + req.width - 1U;
+		uint16_t const max_y = req.top + req.height - 1U;
+		for( uint16_t x=req.left; x<=max_x; ++x ) {
+			if( fabric.is_conflicted( x, req.top ) or fabric.is_conflicted( x, max_y ) ) {
+				return false;
+			}
+		}
+		for( uint16_t y=req.top + 1U; y<max_y; ++y ) {
+			if( fabric.is_conflicted( req.left, y ) or fabric.is_conflicted( max_x, y ) ) {
+				return false;
+			}
+		}
+		// Ensure no request is enclosed by this one	
+		for( uint16_t x = req.left + 1U; x < max_x; ++x ) {
+			for( uint16_t y = req.top + 1U; y < max_y; ++y ) {
+				if( fabric.is_conflicted( x, y ) ) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
 
 	template<typename Container>
 	uint16_t find_unconflicted_area( Container &&reqs ) {
