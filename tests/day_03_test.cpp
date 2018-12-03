@@ -39,7 +39,7 @@ namespace daw {
 		namespace day03 {
 			using namespace std::string_literals;
 
-			static std::array<std::string, 1358> p1_requests = {
+			static std::array<std::string, 1349> p1_requests = {
 			  "#1 @ 286,440: 19x24"s,    "#2 @ 430,120: 20x14"s,
 			  "#3 @ 250,746: 20x17"s,    "#4 @ 639,255: 28x28"s,
 			  "#5 @ 793,21: 23x10"s,     "#6 @ 835,164: 25x11"s,

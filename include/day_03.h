@@ -26,7 +26,7 @@
 #include <cstdint>
 #include <string>
 #include <string_view>
-#include <unordered_map>
+#include <unordered_set>
 
 #include <daw/daw_algorithm.h>
 #include <daw/daw_parser_helper_sv.h>
@@ -35,11 +35,11 @@
 
 namespace daw {
 	struct request_t {
-		size_t id;
-		int32_t left;
-		int32_t top;
-		int32_t width;
-		int32_t height;
+		uint16_t id;
+		uint16_t left;
+		uint16_t top;
+		uint16_t width;
+		uint16_t height;
 	};
 
 	template<typename Container>
@@ -50,94 +50,110 @@ namespace daw {
 			sv.remove_prefix( );
 			request_t tmp{};
 			auto sv_tmp = sv.pop_front( sv.find_first_of( ' ' ) );
-			tmp.id = daw::parser::parse_int<size_t>( sv_tmp );
+			tmp.id = daw::parser::parse_int<uint16_t>( sv_tmp );
 			sv.remove_prefix( sv.find_first_of( '@' ) + 2 );
 			sv_tmp = sv.pop_front( sv.find_first_of( ',' ) );
-			tmp.left = daw::parser::parse_int<int32_t>( sv_tmp );
+			tmp.left = daw::parser::parse_int<uint16_t>( sv_tmp );
 			sv.remove_prefix( );
 			sv_tmp = sv.pop_front( sv.find_first_of( ':' ) );
-			tmp.top = daw::parser::parse_int<int32_t>( sv_tmp );
+			tmp.top = daw::parser::parse_int<uint16_t>( sv_tmp );
 			sv.remove_prefix( 2 );
 			sv_tmp = sv.pop_front( sv.find_first_of( 'x' ) );
-			tmp.width = daw::parser::parse_int<int32_t>( sv_tmp );
+			tmp.width = daw::parser::parse_int<uint16_t>( sv_tmp );
 			sv.remove_prefix( );
-			tmp.height = daw::parser::parse_int<int32_t>( sv );
+			tmp.height = daw::parser::parse_int<uint16_t>( sv );
 			result.push_back( std::move( tmp ) );
 		}
 		return result;
 	}
 
-	template<typename T, intmax_t width, intmax_t height>
-	struct fabric_t {
-		std::vector<T> m_values = {};
+	template<uint16_t width, uint16_t height>
+	class fabric_t {
+		static_assert( width > 0 );
+		static_assert( height > 0 );
 
-		constexpr fabric_t( ) {
-			m_values.resize( static_cast<size_t>( width * height ), T{} );
-		}
+		static inline constexpr size_t const m_size =
+		  static_cast<size_t>( width * height );
 
-		constexpr T &operator[]( size_t n ) noexcept {
-			return m_values[n];
-		}
+		std::vector<uint16_t> m_values = std::vector<uint16_t>( m_size, 0 );
 
-		constexpr T const &operator[]( size_t n ) const noexcept {
-			return m_values[n];
-		}
+	public:
+		fabric_t( ) = default;
 
-		constexpr T &operator( )( intmax_t x, intmax_t y ) noexcept {
+		uint16_t &operator( )( uint16_t x, uint16_t y ) noexcept {
 			return m_values[static_cast<size_t>( x ) +
-			                static_cast<size_t>( y ) * width];
+			                ( static_cast<size_t>( y ) *
+			                  static_cast<size_t>( width ) )];
 		}
 
-		constexpr T const &operator( )( intmax_t x, intmax_t y ) const noexcept {
+		uint16_t const &operator( )( int16_t x, int16_t y ) const noexcept {
 			return m_values[static_cast<size_t>( x ) +
-			                static_cast<size_t>( y ) * width];
+			                ( static_cast<size_t>( y ) *
+			                  static_cast<size_t>( width ) )];
 		}
 	};
 
 	template<typename Container>
-	auto apply_reqs_to_fabric( Container &&requests ) {
-		fabric_t<std::vector<size_t>, 1000, 1000> fabric{};
+	uint32_t calc_conflicted_area( Container &&requests ) {
+		fabric_t<1000, 1000> fabric{};
+		uint32_t conflict_area = 0;
+
 		for( auto const &req : requests ) {
 			for( auto x = req.left; x < ( req.left + req.width ); ++x ) {
 				for( auto y = req.top; y < ( req.top + req.height ); ++y ) {
-					fabric( x, y ).push_back( req.id );
-				}
-			}
-		}
-		return fabric;
-	}
-
-	template<typename Container>
-	intmax_t calc_conflicted_area( Container &&reqs ) {
-		auto fabric = apply_reqs_to_fabric( reqs );
-		intmax_t area = 0;
-		for( intmax_t x = 0; x < 1000; ++x ) {
-			for( intmax_t y = 0; y < 1000; ++y ) {
-				if( fabric( x, y ).size( ) > 1 ) {
-					++area;
-				}
-			}
-		}
-		return area;
-	}
-
-	template<typename Container>
-	size_t find_unconflicted_area( Container &&reqs ) {
-		auto fabric = apply_reqs_to_fabric( reqs );
-
-		for( auto const &req : reqs ) {
-			bool found = true;
-			for( auto x = req.left; found and x < ( req.left + req.width ); ++x ) {
-				for( auto y = req.top; y < ( req.top + req.height ); ++y ) {
-					if( fabric( x, y ).size( ) != 1 ) {
-						found = false;
-						break;
+					++fabric( x, y );
+					if( fabric( x, y ) == 2 ) {
+						++conflict_area;
 					}
 				}
 			}
-			if( found ) {
-				return req.id;
+		}
+		return conflict_area;
+	}
+
+	template<typename Container>
+	auto apply_reqs_to_fabric( Container &&requests ) {
+		struct result_t {
+			fabric_t<1000, 1000> fabric{};
+			std::vector<bool> conflicts{};
+		};
+
+		result_t result{};
+		// Assume req id's match size, if not grow later
+		result.conflicts.resize( std::size( requests ), false );
+
+		for( auto const &req : requests ) {
+			for( auto x = req.left; x < ( req.left + req.width ); ++x ) {
+				for( auto y = req.top; y < ( req.top + req.height ); ++y ) {
+					++result.fabric( x, y );
+					if( result.fabric( x, y ) > 1 ) {
+						result.conflicts[req.id] = true;
+					}
+				}
 			}
+		}
+		return result;
+	}
+
+	constexpr void do_nothing( ) noexcept {}
+	template<typename Container>
+	uint16_t find_unconflicted_area( Container &&reqs ) {
+		auto result = apply_reqs_to_fabric( reqs );
+
+		for( auto const &req : reqs ) {
+			if( result.conflicts[req.id] ) {
+				continue;
+			}
+			for( auto x = req.left; x < ( req.left + req.width ); ++x ) {
+				for( auto y = req.top; y < ( req.top + req.height ); ++y ) {
+					if( result.fabric( x, y ) != 1 ) {
+						goto notfound;
+					}
+				}
+			}
+			return req.id;
+		notfound:
+			do_nothing( );
 		}
 		std::terminate( );
 	}
