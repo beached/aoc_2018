@@ -119,7 +119,7 @@ namespace daw {
 
 		result_t result{};
 		// Assume req id's match size, if not grow later
-		result.conflicts.resize( std::size( requests ), false );
+		result.conflicts.resize( std::size( requests ) + 1, false );
 
 		for( auto const &req : requests ) {
 			for( auto x = req.left; x < ( req.left + req.width ); ++x ) {

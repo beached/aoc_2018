@@ -20,9 +20,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#define BOOST_TEST_MODULE aoc_2018_day_03
-#include <daw/boost_test.h>
-
 #include <array>
 #include <cstdint>
 #include <cstdlib>
@@ -39,7 +36,7 @@ namespace daw {
 		namespace day03 {
 			using namespace std::string_literals;
 
-			static std::array<std::string, 1349> p1_requests = {
+			static std::array<std::string, 1349> request_strs = {
 			  "#1 @ 286,440: 19x24"s,    "#2 @ 430,120: 20x14"s,
 			  "#3 @ 250,746: 20x17"s,    "#4 @ 639,255: 28x28"s,
 			  "#5 @ 793,21: 23x10"s,     "#6 @ 835,164: 25x11"s,
@@ -717,26 +714,39 @@ namespace daw {
 			  "#1349 @ 979,160: 19x17"s,
 			};
 
-			BOOST_AUTO_TEST_CASE( day_03_part_1 ) {
-				std::optional<intmax_t> result{};
-				daw::do_not_optimize( p1_requests );
-				auto const requests = parse_request( p1_requests );
+			template<typename T, typename U>
+			void expecting( T && expected_result, U && result ) noexcept {
+				if( expected_result != result ) {
+					std::cerr << "Invalid result. Expecting '" << expected_result << "' but got '" << result << "'\n";
+					std::terminate( );
+				}
+			}
+
+		void day_03_part_1( ) {
+				std::optional<uint32_t> result{};
+				daw::do_not_optimize( request_strs );
+				auto const requests = parse_request( request_strs );
 				daw::bench_test( "Day 3, Part 1", [&]( ) {
 					result = calc_conflicted_area( requests );
 				} );
 				daw::do_not_optimize( *result );
-				BOOST_REQUIRE_EQUAL( *result, 115242 );
+				expecting( 115242U, *result );
 			}
 
-			BOOST_AUTO_TEST_CASE( day_03_part_2 ) {
-				std::optional<size_t> result{};
-				daw::do_not_optimize( p1_requests );
-				auto const requests = parse_request( p1_requests );
+			void day_03_part_2( ) {
+				std::optional<uint16_t> result{};
+				daw::do_not_optimize( request_strs );
+				auto const requests = parse_request( request_strs );
 				daw::bench_test( "Day 3, Part 2", [&]( ) {
 					result = find_unconflicted_area( requests );
 				} );
-				BOOST_REQUIRE_EQUAL( *result, 1046 );
+				expecting( 1046U, *result );
 			}
 		} // namespace day03
 	}   // namespace aoc_2018
 } // namespace daw
+
+int main( ) {
+	daw::aoc_2018::day03::day_03_part_1( );
+	daw::aoc_2018::day03::day_03_part_2( );
+}
