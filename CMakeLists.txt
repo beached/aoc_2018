@@ -5,16 +5,10 @@ set(CMAKE_CXX_STANDARD 17)
 
 find_package( Boost 1.58.0 COMPONENTS system iostreams filesystem regex unit_test_framework REQUIRED )
 
-if( ${CMAKE_CXX_COMPILER_ID} STREQUAL 'MSVC' )
-	add_definitions( -DNOMINMAX -DD_WIN32_WINNT=0x0601 )
-	add_compile_options( /W2 )
-else( )
-	if( ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "AppleClang" )
-		add_compile_options( -Weverything -Wno-c++98-compat -Wno-covered-switch-default -Wno-padded -Wno-exit-time-destructors -Wno-c++98-compat-pedantic -Wno-unused-parameter -Wno-missing-noreturn -Wno-missing-prototypes -Wno-disabled-macro-expansion -Wno-missing-braces -Wno-float-equal )
-	elseif( ${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" )
-		add_compile_options( -Wall -Wno-deprecated-declarations -Wduplicated-cond -Wlogical-op -Wnull-dereference -Wold-style-cast -Wshadow)
-	endif( )
-endif( )
+set( CMAKE_CXX_STANDARD 2a CACHE STRING "The C++ standard whose features are requested.")
+add_definitions( -DBOOST_TEST_DYN_LINK -DBOOST_ALL_NO_LIB -DBOOST_ALL_DYN_LINK )
+
+include( "${CMAKE_SOURCE_DIR}/dependent_projects/CMakeListsCompiler.txt" )
 
 if( EXISTS "${CMAKE_SOURCE_DIR}/dependent_projects/build" )
 	add_custom_target( dependency_stub )
@@ -25,7 +19,7 @@ else( )
 	include( "${CMAKE_SOURCE_DIR}/dependent_projects/dependencies.txt" )
 
 	add_library( dependency_stub STATIC "${CMAKE_SOURCE_DIR}/dependent_projects/stub.cpp" )
-	add_dependencies( dependency_stub header_libraries_prj )
+	add_dependencies( dependency_stub header_libraries_prj date_prj )
 include_directories( SYSTEM "${CMAKE_BINARY_DIR}/install/include" )
 endif( )
 
@@ -43,10 +37,11 @@ set( HEADER_FILES
 	${HEADER_FOLDER}/day_01.h
 	${HEADER_FOLDER}/day_02.h
 	${HEADER_FOLDER}/day_03.h
+	${HEADER_FOLDER}/day_04.h
 )
 
 set( SOURCE_FILES
-	${SOURCE_FOLDER}/day_03.cpp
+#	${SOURCE_FOLDER}/day_03.cpp
 )
 
 #add_library ( aoc_2018_lib STATIC ${HEADER_FILES} ${SOURCE_FILES} )
