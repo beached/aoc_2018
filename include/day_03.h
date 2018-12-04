@@ -44,7 +44,8 @@ namespace daw {
 		};
 
 		template<size_t N>
-		constexpr std::array<request_t, N> parse_request( std::array<daw::string_view, N> const & requests ) noexcept {
+		constexpr std::array<request_t, N>
+		parse_request( std::array<daw::string_view, N> const &requests ) noexcept {
 			std::array<request_t, N> result{};
 			for( size_t idx = 0; idx < N; ++idx ) {
 				auto sv = requests[idx];
@@ -117,19 +118,20 @@ namespace daw {
 		}
 
 		template<size_t N>
-		constexpr auto apply_reqs_to_fabric( std::array<request_t, N> const & requests ) {
+		constexpr auto
+		apply_reqs_to_fabric( std::array<request_t, N> const &requests ) {
 			struct {
 				fabric_t<1000, 1000> fabric{};
 				std::array<bool, N> conflicts{};
 			} result{};
 
-			for( size_t id=0; id < N; ++id ) {
-				auto const & req = requests[id];
+			for( size_t id = 0; id < N; ++id ) {
+				auto const &req = requests[id];
 				for( auto x = req.left; x < ( req.left + req.width ); ++x ) {
 					for( auto y = req.top; y < ( req.top + req.height ); ++y ) {
 						++result.fabric( x, y );
 						if( result.fabric( x, y ) > 1U ) {
-							result.conflicts[id+1] = true;
+							result.conflicts[id + 1] = true;
 						}
 					}
 				}
