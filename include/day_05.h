@@ -94,8 +94,8 @@ namespace daw {
 
 			return std::accumulate( begin( unit_types ), end( unit_types ), std::numeric_limits<size_t>::max( ), [sv]( auto cur_min, auto u ) {
 				auto poly = sv.to_string();
-				poly.erase( std::remove_if( begin( poly ), end( poly ), [u]( auto c ) {
-					return std::toupper( c ) == std::toupper( u );
+				poly.erase( std::remove_if( begin( poly ), end( poly ), [u=std::toupper(u)]( auto c ) {
+					return std::toupper( c ) == u;
 				}), end( poly ) );
 				auto tmp = alchemical_reduction( daw::string_view( poly.data( ), poly.size( ) ) );
 				if( tmp < cur_min ) {
