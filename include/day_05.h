@@ -90,19 +90,17 @@ namespace daw {
 		template<typename CharT>
 		size_t smallest( daw::basic_string_view<CharT> sv ) {
 			// Find all unit types
-			auto const unit_types = [sv]( ) {
-				std::string result{};
-				std::transform( sv.begin( ), sv.end( ), std::back_inserter( result ), []( auto c ) {
-					return std::toupper( c );
-				});
-				std::sort( begin( result ), end( result ) );
-				result.erase( unique( begin( result ), end( result ) ), end( result ) );
+			constexpr auto const unit_types = []( ) constexpr {
+				std::array<char, 26> result{};
+				for( char n = 'A'; n <= 'Z'; ++n ) {
+					result[static_cast<size_t>( n-'A' )] = n;
+				}
 				return result;
 			}( );
 
 			return std::accumulate( begin( unit_types ), end( unit_types ), std::numeric_limits<size_t>::max( ), [sv]( auto cur_min, auto u ) {
 				auto poly = sv.to_string();
-				poly.erase( std::remove_if( begin( poly ), end( poly ), [u=std::toupper(u)]( auto c ) {
+				poly.erase( std::remove_if( begin( poly ), end( poly ), [u]( auto c ) {
 					return std::toupper( c ) == u;
 				}), end( poly ) );
 				auto tmp = alchemical_reduction( daw::string_view( poly.data( ), poly.size( ) ) );
