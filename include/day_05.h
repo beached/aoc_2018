@@ -30,7 +30,6 @@
 
 #include <daw/daw_algorithm.h>
 #include <daw/daw_parser_helper_sv.h>
-#define NOSTRING
 #include <daw/daw_static_string.h>
 #include <daw/daw_string_view.h>
 #include <daw/daw_traits.h>
@@ -95,7 +94,7 @@ namespace daw {
 			return daw::algorithm::accumulate(
 			  begin( unit_types ), end( unit_types ),
 			  std::numeric_limits<size_t>::max( ),
-			  [sv]( auto cur_min, auto u ) constexpr {
+			  [sv]( auto cur_min, auto u ) {
 				  daw::basic_static_string<CharT, BuffSize> poly( sv.data( ), sv.size( ) );
 				  auto pos = daw::algorithm::remove_if( poly.data( ), poly.data( ) + poly.size( ), [u]( auto c ) {
 					  return toupper( c ) == u;
