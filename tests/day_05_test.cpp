@@ -53,8 +53,16 @@ namespace daw {
 } // namespace daw
 
 int main( ) {
-	auto result = daw::alchemical_reduction( daw::aoc_2018::day05::polymer );
+	size_t result;
+	daw::bench_test( "Day 5, part 1", [&]( ) {
+		result = daw::alchemical_reduction(daw::aoc_2018::day05::polymer);
+	});
+	daw::do_not_optimize( result );
 	daw::aoc_2018::day05::expecting( result, 9154U );
-	auto result2 = daw::smallest( daw::aoc_2018::day05::polymer );
-	daw::aoc_2018::day05::expecting( result2, 4556U );
+
+	daw::bench_test( "Day 5, part 2", [&]( ) {
+		result = daw::smallest(daw::aoc_2018::day05::polymer);
+	});
+	daw::do_not_optimize( result );
+	daw::aoc_2018::day05::expecting( result, 4556U );
 }

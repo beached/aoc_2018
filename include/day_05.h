@@ -37,7 +37,7 @@ namespace daw {
 	namespace {
 		template<typename CharT>
 		bool match( CharT lhs, CharT rhs ) noexcept {
-			return std::toupper( lhs ) == std::toupper( rhs ) and lhs != rhs;
+			return lhs != rhs and std::toupper( lhs ) == std::toupper( rhs );
 		}
 
 		template<typename CharT>
@@ -58,11 +58,19 @@ namespace daw {
 				};
 				auto pos = sv.find_first_of_if( matcher, 1 );
 				while( pos != sv.npos ) {
-					changed = true;
+					 changed = true;
 					tmp += sv.pop_front( pos - 1 ).to_string( );
 					sv.remove_prefix( 2 );
-					last_c = sv.front( );
-					pos = sv.find_first_of_if( matcher, 1 );
+					while( !tmp.empty( ) and !sv.empty( ) and match( tmp.back( ), sv.front( ) ) ) {
+						tmp.pop_back( );
+						sv.pop_front( );
+					}
+					if( !sv.empty( ) ) {
+						last_c = sv.front();
+						pos = sv.find_first_of_if(matcher, 1);
+					} else {
+						pos = sv.npos;
+					}
 				}
 				if( changed ) {
 					if (!sv.empty()) {
