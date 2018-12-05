@@ -21,8 +21,8 @@
 // SOFTWARE.
 
 #include <array>
-#include <cstdint>
 #include <cstddef>
+#include <cstdint>
 #include <cstdlib>
 #include <iostream>
 #include <vector>
@@ -1119,13 +1119,13 @@ int main( ) {
 	size_t result;
 	daw::bench_test( "Day 4, part 1", [&]( ) {
 		result = daw::choose_sleepy_guard( daw::aoc_2018::day04::log_entries );
-	});
+	} );
 	daw::do_not_optimize( result );
 	daw::aoc_2018::day04::expecting( result, 95199U );
 	daw::bench_test( "Day 4, part 2", [&]( ) {
 		result =
-				daw::choose_most_sleepy_on_minute( daw::aoc_2018::day04::log_entries );
-	});
+		  daw::choose_most_sleepy_on_minute( daw::aoc_2018::day04::log_entries );
+	} );
 	daw::do_not_optimize( result );
 	daw::aoc_2018::day04::expecting( result, 7887U );
 }

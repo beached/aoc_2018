@@ -30,33 +30,37 @@
 
 #include <daw/daw_algorithm.h>
 #include <daw/daw_parser_helper_sv.h>
+#define NOSTRING
+#include <daw/daw_static_string.h>
 #include <daw/daw_string_view.h>
 #include <daw/daw_traits.h>
 
 namespace daw {
 	namespace {
-		template<typename CharT>
-		bool match( CharT lhs, CharT rhs ) noexcept {
-			return lhs != rhs and std::toupper( lhs ) == std::toupper( rhs );
+		constexpr char toupper( char c ) noexcept {
+			c &= ~( 'a' - 'A' );
+			return c;
 		}
 
 		template<typename CharT>
-		size_t alchemical_reduction( daw::basic_string_view<CharT> sv ) noexcept {
-			bool changed = true;
-			std::basic_string<CharT> result{};
+		constexpr bool match( CharT lhs, CharT rhs ) noexcept {
+			return lhs != rhs and toupper( lhs ) == toupper( rhs );
+		}
 
-			result.reserve( sv.size( ) );
+		template<size_t BuffSize, typename CharT>
+		constexpr size_t
+		alchemical_reduction( daw::basic_string_view<CharT> sv ) noexcept {
+			daw::basic_static_string<CharT, BuffSize> result{};
 
 			CharT last_c = sv.front( );
-			auto const matcher = [&last_c]( auto c ) {
+			auto const matcher = [&last_c]( auto c ) constexpr {
 				auto r = match( last_c, c );
 				last_c = c;
 				return r;
 			};
 			auto pos = sv.find_first_of_if( matcher, 1 );
 			while( pos != sv.npos ) {
-				changed = true;
-				result += sv.pop_front( pos - 1 ).to_string( );
+				result.append( sv.pop_front( pos - 1 ) );
 				sv.remove_prefix( 2 );
 				while( !result.empty( ) and !sv.empty( ) and
 				       match( result.back( ), sv.front( ) ) ) {
@@ -72,35 +76,32 @@ namespace daw {
 			}
 			while( !result.empty( ) and !sv.empty( ) and
 			       match( result.back( ), sv.front( ) ) ) {
-				changed = true;
 				result.pop_back( );
 				sv.pop_front( );
 			}
-			result += sv.to_string( );
+			result.append( sv );
 			return result.size( );
 		}
 
-		template<typename CharT>
-		size_t smallest( daw::basic_string_view<CharT> sv ) {
+		template<size_t BuffSize, typename CharT>
+		constexpr size_t smallest( daw::basic_string_view<CharT> sv ) {
 			// Find all unit types
-			constexpr auto const unit_types = []( ) constexpr {
+			constexpr auto const unit_types = []( ) {
 				std::array<char, 26> result{};
-				for( char n = 'A'; n <= 'Z'; ++n ) {
-					result[static_cast<size_t>( n - 'A' )] = n;
-				}
+				daw::algorithm::iota( begin( result ), end( result ), 'A' );
 				return result;
-			}
-			( );
+			}( );
 
-			return std::accumulate(
+			return daw::algorithm::accumulate(
 			  begin( unit_types ), end( unit_types ),
-			  std::numeric_limits<size_t>::max( ), [sv]( auto cur_min, auto u ) {
-				  auto poly = sv.to_string( );
-				  poly.erase(
-				    std::remove_if( begin( poly ), end( poly ),
-				                    [u]( auto c ) { return std::toupper( c ) == u; } ),
-				    end( poly ) );
-				  auto tmp = alchemical_reduction(
+			  std::numeric_limits<size_t>::max( ),
+			  [sv]( auto cur_min, auto u ) constexpr {
+				  daw::basic_static_string<CharT, BuffSize> poly( sv.data( ), sv.size( ) );
+				  auto pos = daw::algorithm::remove_if( poly.data( ), poly.data( ) + poly.size( ), [u]( auto c ) {
+					  return toupper( c ) == u;
+				  } );
+				  poly.remove_suffix( static_cast<size_t>( std::distance( pos, poly.data( ) + poly.size( ) ) ) );
+				  auto tmp = alchemical_reduction<BuffSize>(
 				    daw::string_view( poly.data( ), poly.size( ) ) );
 				  if( tmp < cur_min ) {
 					  return tmp;
