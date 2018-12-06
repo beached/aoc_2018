@@ -167,11 +167,9 @@ namespace daw {
 			};
 
 			size_t part_01( ) {
-				daw::do_not_optimize( box_ids );
 				size_t result;
-				daw::bench_test( "Part 1",
+				daw::bench_n_test<100>( "Part 1",
 				                 [&]( ) { result = get_checksum( box_ids ); } );
-				daw::do_not_optimize( result );
 				return result;
 			}
 
@@ -181,9 +179,7 @@ namespace daw {
 
 			std::string part_02( ) {
 				std::string result{};
-				daw::do_not_optimize( box_ids );
-				daw::bench_test( "Part 2", [&]( ) { result = get_match( box_ids ); } );
-				daw::do_not_optimize( result );
+				daw::bench_n_test<100>( "Part 2", [&]( ) { result = get_match( box_ids ); } );
 				return result;
 			}
 

@@ -54,15 +54,13 @@ namespace daw {
 
 int main( ) {
 	size_t result;
-	daw::bench_test( "Day 5, part 1", [&]( ) {
+	daw::bench_n_test<1000>( "Day 5, part 1", [&]( ) {
 		result = daw::alchemical_reduction<50'000>( daw::aoc_2018::day05::polymer );
 	} );
-	daw::do_not_optimize( result );
 	daw::aoc_2018::day05::expecting( 9154U, result );
 
-	daw::bench_test( "Day 5, part 2", [&]( ) {
+	daw::bench_n_test<1000>( "Day 5, part 2", [&]( ) {
 		result = daw::smallest<50'000>( daw::aoc_2018::day05::polymer );
 	} );
-	daw::do_not_optimize( result );
 	daw::aoc_2018::day05::expecting( 4556U, result );
 }

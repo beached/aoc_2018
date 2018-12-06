@@ -723,56 +723,26 @@ namespace daw {
 				}
 			}
 
-			double day_03_part_1( ) {
-				std::optional<uint32_t> result{};
-				daw::do_not_optimize( requests );
-				auto t = daw::benchmark(
-				  [&]( ) { result = calc_conflicted_area( requests ); } );
-				daw::do_not_optimize( *result );
-				expecting( 115242U, *result );
-				return t;
+			template<size_t Runs>
+			auto day_03_part_1( ) {
+				auto result = *daw::bench_n_test<Runs>( "Day 3, part 1", [&]( ) { return calc_conflicted_area( requests ); } );
+				expecting( 115242U, result );
+				return result;
 			}
 			// static_assert( calc_conflicted_area( parse_request( request_strs ) ) ==
 			// 115242U );
 
-			double day_03_part_2( ) {
-				std::optional<uint16_t> result{};
-				daw::do_not_optimize( requests );
-				auto t = daw::benchmark(
-				  [&]( ) { result = find_unconflicted_area( requests ); } );
-				daw::do_not_optimize( *result );
-				expecting( 1046U, *result );
-				return t;
+			template<size_t Runs>
+			auto day_03_part_2( ) {
+				auto result = *daw::bench_n_test<Runs>( "Day 3, part 2", [&]( ) { return find_unconflicted_area( requests ); } );
+				expecting( 1046U, result );
+				return result;
 			}
 		} // namespace day03
 	}   // namespace aoc_2018
 } // namespace daw
 
 int main( ) {
-	constexpr size_t count = 1'000;
-	double t = 0.0;
-	double t_min = std::numeric_limits<double>::max( );
-	for( size_t n = 0; n < count; ++n ) {
-		auto tmp = daw::aoc_2018::day03::day_03_part_1( );
-		if( tmp < t_min ) {
-			t_min = tmp;
-		}
-		t += tmp;
-	}
-	t /= static_cast<double>( count );
-	std::cout << "Day 3, part 1 avg(" << daw::utility::format_seconds( t, 2 )
-	          << ") min(" << daw::utility::format_seconds( t_min, 2 ) << ")\n";
-	t = 0.0;
-	t_min = std::numeric_limits<double>::max( );
-	for( size_t n = 0; n < count; ++n ) {
-		auto tmp = daw::aoc_2018::day03::day_03_part_2( );
-		if( tmp < t_min ) {
-			t_min = tmp;
-		}
-		t += tmp;
-	}
-	t /= static_cast<double>( count );
-	std::cout << "Day 3, part 2 avg(" << daw::utility::format_seconds( t, 2 )
-	          << ") min(" << daw::utility::format_seconds( t_min, 2 ) << ")\n";
-	t = 0.0;
+	daw::aoc_2018::day03::day_03_part_1<100>( );
+	daw::aoc_2018::day03::day_03_part_2<100>( );
 }
