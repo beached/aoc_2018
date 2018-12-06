@@ -96,10 +96,9 @@ namespace daw {
 			  std::numeric_limits<size_t>::max( ),
 			  [sv]( auto cur_min, auto u ) {
 				  daw::basic_static_string<CharT, BuffSize> poly( sv.data( ), sv.size( ) );
-				  auto pos = daw::algorithm::remove_if( poly.data( ), poly.data( ) + poly.size( ), [u]( auto c ) {
+				  poly.erase( daw::algorithm::remove_if( poly.data( ), poly.data( ) + poly.size( ), [u]( auto c ) {
 					  return toupper( c ) == u;
-				  } );
-				  poly.remove_suffix( static_cast<size_t>( std::distance( pos, poly.data( ) + poly.size( ) ) ) );
+				  } ), end( poly ) );
 				  auto tmp = alchemical_reduction<BuffSize>(
 				    daw::string_view( poly.data( ), poly.size( ) ) );
 				  if( tmp < cur_min ) {
