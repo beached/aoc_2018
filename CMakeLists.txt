@@ -39,6 +39,7 @@ set( HEADER_FILES
 	${HEADER_FOLDER}/day_03.h
 	${HEADER_FOLDER}/day_04.h
 	${HEADER_FOLDER}/day_05.h
+	${HEADER_FOLDER}/day_06.h
 )
 
 set( SOURCE_FILES
@@ -62,4 +63,7 @@ target_link_libraries( day_04_test ${CMAKE_DL_LIBS} ${COMPILER_SPECIFIC_LIBS} ${
 
 add_executable( day_05_test ${HEADER_FILES} ${TEST_FOLDER}/day_05_test.cpp )
 target_link_libraries( day_05_test ${CMAKE_DL_LIBS} ${COMPILER_SPECIFIC_LIBS} ${CMAKE_THREAD_LIBS_INIT} )
+
+add_executable( day_06_test ${HEADER_FILES} ${TEST_FOLDER}/day_06_test.cpp )
+target_link_libraries( day_06_test ${CMAKE_DL_LIBS} ${COMPILER_SPECIFIC_LIBS} ${CMAKE_THREAD_LIBS_INIT} )
 
