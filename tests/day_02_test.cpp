@@ -20,9 +20,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#define BOOST_TEST_MODULE aoc_2018_day_02
-#include <daw/boost_test.h>
-
 #include <array>
 #include <cstdint>
 #include <cstdlib>
@@ -166,26 +163,24 @@ namespace daw {
 			  "oiicdpbseqhxryfdloktnujvza"s, "oihcjpbsxqhxryfmlgktnujvza"s,
 			};
 
-			size_t part_01( ) {
-				size_t result;
-				daw::bench_n_test<100>( "Part 1",
-				                 [&]( ) { result = get_checksum( box_ids ); } );
-				return result;
+			void part_01( ) {
+				auto const result = *daw::bench_n_test<100>(
+				  "Day 2, part 1", [&]( ) { return get_checksum( box_ids ); } );
+
+				daw::expecting( result, 5880 );
 			}
 
-			BOOST_AUTO_TEST_CASE( part_01_test ) {
-				BOOST_REQUIRE_EQUAL( part_01( ), 5880 );
-			}
+			void part_02( ) {
+				auto const result = *daw::bench_n_test<100>(
+				  "Day 2, part 2", [&]( ) { return get_match( box_ids ); } );
 
-			std::string part_02( ) {
-				std::string result{};
-				daw::bench_n_test<100>( "Part 2", [&]( ) { result = get_match( box_ids ); } );
-				return result;
-			}
-
-			BOOST_AUTO_TEST_CASE( part_02_test ) {
-				BOOST_REQUIRE_EQUAL( part_02( ), "tiwcdpbseqhxryfmgkvjujvza" );
+				expecting( result, "tiwcdpbseqhxryfmgkvjujvza" );
 			}
 		} // namespace day02
 	}   // namespace aoc_2018
 } // namespace daw
+
+int main( ) {
+	daw::aoc_2018::day02::part_01( );
+	daw::aoc_2018::day02::part_02( );
+}

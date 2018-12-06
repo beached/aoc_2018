@@ -34,15 +34,6 @@
 namespace daw {
 	namespace aoc_2018 {
 		namespace day05 {
-			template<typename T, typename U>
-			constexpr void expecting( T &&expected_result, U &&result ) noexcept {
-				if( expected_result != result ) {
-					std::cerr << "Invalid result. Expecting '" << expected_result
-					          << "' but got '" << result << "'\n";
-					std::terminate( );
-				}
-			}
-
 			using namespace daw::string_view_literals;
 
 			static constexpr daw::string_view const polymer =
@@ -53,14 +44,13 @@ namespace daw {
 } // namespace daw
 
 int main( ) {
-	size_t result;
-	daw::bench_n_test<1000>( "Day 5, part 1", [&]( ) {
-		result = daw::alchemical_reduction<50'000>( daw::aoc_2018::day05::polymer );
+	size_t result = *daw::bench_n_test<1000>( "Day 5, part 1", [&]( ) {
+		return daw::alchemical_reduction<50'000>( daw::aoc_2018::day05::polymer );
 	} );
-	daw::aoc_2018::day05::expecting( 9154U, result );
+	daw::expecting( 9154U, result );
 
-	daw::bench_n_test<1000>( "Day 5, part 2", [&]( ) {
-		result = daw::smallest<50'000>( daw::aoc_2018::day05::polymer );
+	result = *daw::bench_n_test<1000>( "Day 5, part 2", [&]( ) {
+		return daw::smallest<50'000>( daw::aoc_2018::day05::polymer );
 	} );
-	daw::aoc_2018::day05::expecting( 4556U, result );
+	daw::expecting( 4556U, result );
 }

@@ -35,15 +35,6 @@
 namespace daw {
 	namespace aoc_2018 {
 		namespace day04 {
-			template<typename T, typename U>
-			constexpr void expecting( T &&expected_result, U &&result ) noexcept {
-				if( expected_result != result ) {
-					std::cerr << "Invalid result. Expecting '" << expected_result
-					          << "' but got '" << result << "'\n";
-					std::terminate( );
-				}
-			}
-
 			using namespace daw::string_view_literals;
 			static auto const log_entries_sm =
 			  parse_records( std::array<daw::string_view, 17>{
@@ -1116,16 +1107,15 @@ namespace daw {
 } // namespace daw
 
 int main( ) {
-	size_t result;
-	daw::bench_test( "Day 4, part 1", [&]( ) {
-		result = daw::choose_sleepy_guard( daw::aoc_2018::day04::log_entries );
+	size_t result = *daw::bench_n_test<100>( "Day 4, part 1", [&]( ) {
+		return daw::choose_sleepy_guard( daw::aoc_2018::day04::log_entries );
 	} );
-	daw::do_not_optimize( result );
-	daw::aoc_2018::day04::expecting( result, 95199U );
-	daw::bench_test( "Day 4, part 2", [&]( ) {
-		result =
-		  daw::choose_most_sleepy_on_minute( daw::aoc_2018::day04::log_entries );
+	daw::expecting( result, 95199U );
+
+	result = *daw::bench_n_test<100>( "Day 4, part 2", [&]( ) {
+		return daw::choose_most_sleepy_on_minute(
+		  daw::aoc_2018::day04::log_entries );
 	} );
-	daw::do_not_optimize( result );
-	daw::aoc_2018::day04::expecting( result, 7887U );
+	daw::expecting( result, 7887U );
 }
+

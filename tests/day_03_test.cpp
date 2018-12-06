@@ -714,29 +714,18 @@ namespace daw {
 			  "#1349 @ 979,160: 19x17"_sv,
 			} );
 
-			template<typename T, typename U>
-			constexpr void expecting( T &&expected_result, U &&result ) noexcept {
-				if( expected_result != result ) {
-					std::cerr << "Invalid result. Expecting '" << expected_result
-					          << "' but got '" << result << "'\n";
-					std::terminate( );
-				}
-			}
-
 			template<size_t Runs>
-			auto day_03_part_1( ) {
-				auto result = *daw::bench_n_test<Runs>( "Day 3, part 1", [&]( ) { return calc_conflicted_area( requests ); } );
-				expecting( 115242U, result );
-				return result;
+			void day_03_part_1( ) {
+				auto const result = *daw::bench_n_test<Runs>( "Day 3, part 1", [&]( ) { return calc_conflicted_area( requests ); } );
+				daw::expecting( 115242U, result );
 			}
 			// static_assert( calc_conflicted_area( parse_request( request_strs ) ) ==
 			// 115242U );
 
 			template<size_t Runs>
-			auto day_03_part_2( ) {
-				auto result = *daw::bench_n_test<Runs>( "Day 3, part 2", [&]( ) { return find_unconflicted_area( requests ); } );
-				expecting( 1046U, result );
-				return result;
+			void day_03_part_2( ) {
+				auto const result = *daw::bench_n_test<Runs>( "Day 3, part 2", [&]( ) { return find_unconflicted_area( requests ); } );
+				daw::expecting( 1046U, result );
 			}
 		} // namespace day03
 	}   // namespace aoc_2018
