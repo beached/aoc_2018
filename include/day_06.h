@@ -48,8 +48,13 @@ namespace daw {
 			using iterator = typename std::array<point_t, N>::iterator;
 		};
 
-		template<int16_t width, int16_t height>
+		template<int16_t Max_x, int16_t Max_y, int16_t Min_x = 0, int16_t Min_y = 0>
 		struct grid_t {
+			static inline constexpr int16_t const width = Max_x - Min_x;
+			static_assert( width > 0 );
+			static inline constexpr int16_t const height = Max_y - Min_y;
+			static_assert( height > 0 );
+
 			static inline constexpr size_t const m_size =
 			  static_cast<size_t>( width * height );
 
@@ -61,8 +66,23 @@ namespace daw {
 			  std::numeric_limits<value_type>::max( ) - 1;
 
 			std::array<value_type, m_size> m_values{};
-			size_type off_x = 0;
-			size_type off_y = 0;
+
+			constexpr size_type min_x( ) const noexcept {
+				return Min_x;
+			}
+
+			constexpr size_type max_x( ) const noexcept {
+				return Max_x;
+			}
+
+
+			constexpr size_type min_y( ) const noexcept {
+				return Min_y;
+			}
+
+			constexpr size_type max_y( ) const noexcept {
+				return Max_y;
+			}
 
 			constexpr grid_t( ) noexcept {
 				for( auto &v : m_values ) {
@@ -71,15 +91,15 @@ namespace daw {
 			}
 
 			constexpr auto &operator( )( size_type x, size_type y ) noexcept {
-				return m_values[static_cast<size_t>( x + off_x ) +
-				                ( static_cast<size_t>( y + off_y ) *
+				return m_values[static_cast<size_t>( x - Min_x ) +
+				                ( static_cast<size_t>( y - Min_y ) *
 				                  static_cast<size_t>( width ) )];
 			}
 
 			constexpr auto const &operator( )( size_type x, size_type y ) const
 			  noexcept {
-				return m_values[static_cast<size_t>( x + off_x ) +
-				                ( static_cast<size_t>( y + off_y ) *
+				return m_values[static_cast<size_t>( x - Min_x ) +
+												( static_cast<size_t>( y - Min_y ) *
 				                  static_cast<size_t>( width ) )];
 			}
 		};
@@ -130,16 +150,14 @@ namespace daw {
 
 		template<size_t N>
 		auto part_01( point_array_t<N> const &coords ) {
-			constexpr int16_t const MAXX = 360;
-			constexpr int16_t const MAXY = 360;
-			grid_t<MAXX, MAXY> grid{};
-			for( int16_t x = 0; x < MAXX; ++x ) {
-				for( int16_t y = 0; y < MAXY; ++y ) {
+			grid_t<360, 360> grid{};
+			for( int16_t x = grid.min_x( ); x < grid.max_x( ); ++x ) {
+				for( int16_t y = grid.min_y( ); y < grid.max_y( ); ++y ) {
 					std::array<std::pair<size_t, int16_t>, N> distances{};
 					auto const pt = point_t{x, y};
 					for( size_t n = 0; n < coords.points.size( ); ++n ) {
 						distances[n] =
-						  std::pair<size_t, int16_t>( n, distance( pt, coords.points[n] ) );
+						  std::make_pair( n, distance( pt, coords.points[n] ) );
 					}
 					std::sort(
 					  begin( distances ), end( distances ),
@@ -151,20 +169,27 @@ namespace daw {
 					}
 				}
 			}
-			std::set<intmax_t> invalid_points{};
+			std::array<bool, N> invalid_points{};
 			// All perimiter points are for removal
 			// do not count their areas here as it doesn't matter
-			for( int16_t x = 0; x < MAXX; ++x ) {
-				invalid_points.insert( grid( x, 0 ) );
-				invalid_points.insert( grid( x, MAXY - 1 ) );
+			auto const set_invalid = [&]( auto x, auto y ) {
+				auto pos = grid( x, y );
+				if( pos < grid.common_v ) {
+					invalid_points[pos] = true;
+				}
+			};
+
+			for( int16_t x = grid.min_x( ); x < grid.max_x( ); ++x ) {
+				set_invalid( x, grid.min_y( ));
+				set_invalid( x, grid.max_y( ) - 1 );
 			}
-			for( int16_t y = 1; y < MAXY; ++y ) {
-				invalid_points.insert( grid( 0, y ) );
-				invalid_points.insert( grid( MAXX - 1, y ) );
+			for( int16_t y = grid.min_y( )+1; y <grid.max_y( )-1; ++y ) {
+				set_invalid( grid.min_x( ), y );
+				set_invalid( grid.max_x( ) - 1, y );
 			}
 			std::array<size_t, N> areas{};
-			for( int16_t x = 1; x < ( MAXX - 1 ); ++x ) {
-				for( int16_t y = 1; y < ( MAXY - 1 ); ++y ) {
+			for( int16_t x = grid.min_x( ) + 1; x < grid.max_x( ) - 1; ++x ) {
+				for( int16_t y = grid.min_x( ) + 1; y < grid.max_x( ) -1 ; ++y ) {
 					if( grid( x, y ) < grid.no_value_v ) {
 						++areas[grid( x, y )];
 					}
@@ -173,14 +198,14 @@ namespace daw {
 			int16_t max_point = [&]( ) {
 				int16_t n = 0;
 				// assume at least 1 is valid
-				while( invalid_points.count( n ) > 0 ) {
+				while( invalid_points[n] ) {
 					++n;
 				}
 				return n;
 			}( );
 			int16_t max_area = areas[max_point];
 			for( auto n = max_point; n < N; ++n ) {
-				if( invalid_points.count( n ) > 0 ) {
+				if( invalid_points[n] ) {
 					continue;
 				}
 				if( areas[n] > max_area ) {
@@ -192,15 +217,10 @@ namespace daw {
 		}
 
 		template<size_t MaxDistance, size_t N>
-		auto part_02( point_array_t<N> const &coords ) {
-			constexpr int16_t const MAXX = 1000;
-			constexpr int16_t const MAXY = 1000;
-			auto grid_ptr = std::make_unique<grid_t<(MAXX*2+1), (MAXY*2+1)>>( );
-			auto & grid = *grid_ptr;
-			grid.off_x = MAXX;
-			grid.off_y = MAXY;
-			for( int16_t x = -MAXX; x < MAXX; ++x ) {
-				for (int16_t y = -MAXY; y < MAXY; ++y) {
+		constexpr auto part_02( point_array_t<N> const &coords ) {
+			grid_t<575, 575, -200, -200> grid{};
+			for( int16_t x = grid.min_x( ); x < grid.max_x( ); ++x ) {
+				for (int16_t y = grid.min_x( ); y < grid.max_y( ); ++y) {
 					grid(x, y) = daw::algorithm::accumulate(begin(coords.points), end(coords.points), 0ULL,
 																									[pt = point_t{x, y}](auto tot, auto pt2) {
 																										tot += distance(pt, pt2);

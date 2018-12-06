@@ -29,9 +29,6 @@ namespace daw {
 	namespace aoc_2018 {
 		namespace day06 {
 			using namespace daw::string_view_literals;
-			static constexpr auto const grid_pts_sm =
-			  parse_grid( std::array<daw::string_view, 6>{"1, 1", "1, 6", "8, 3",
-			                                              "3, 4", "5, 5", "8, 9"} );
 			static constexpr auto const grid_pts =
 			  parse_grid( std::array<daw::string_view, 50>{
 			    "152, 292", "163, 90",  "258, 65",  "123, 147", "342, 42",
