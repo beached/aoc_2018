@@ -149,7 +149,8 @@ namespace daw {
 		}
 
 		template<size_t N>
-		auto part_01( point_array_t<N> const &coords ) {
+		constexpr auto part_01( point_array_t<N> const &coords ) {
+			static_assert( N >= 2 );
 			grid_t<360, 360> grid{};
 			for( int16_t x = grid.min_x( ); x < grid.max_x( ); ++x ) {
 				for( int16_t y = grid.min_y( ); y < grid.max_y( ); ++y ) {
@@ -159,35 +160,52 @@ namespace daw {
 						distances[n] =
 						  std::make_pair( n, distance( pt, coords.points[n] ) );
 					}
-					std::sort(
-					  begin( distances ), end( distances ),
-					  []( auto lhs, auto rhs ) { return lhs.second < rhs.second; } );
-					if( distances[0].second == distances[1].second ) {
+					std::array<std::pair<size_t, int16_t>, 2> two_smallest{};
+					if( distances[0].second < distances[1].second ) {
+						two_smallest[0] = distances[0];
+						two_smallest[1] = distances[1];
+					} else {
+						two_smallest[0] = distances[1];
+						two_smallest[1] = distances[0];
+					}
+
+					for( size_t n=2; n<N; ++n ) {
+						if( distances[n].second < two_smallest[0].second ) {
+							two_smallest[1] = two_smallest[0];
+							two_smallest[0] = distances[n];
+						} else if( distances[n].second < two_smallest[1].second ) {
+							two_smallest[1] = distances[n];
+						}
+					}
+					if( two_smallest[0].second == two_smallest[1].second ) {
 						grid( x, y ) = grid.common_v;
 					} else {
-						grid( x, y ) = distances[0].first;
+						grid( x, y ) = two_smallest[0].first;
 					}
 				}
 			}
 			std::array<bool, N> invalid_points{};
 			// All perimiter points are for removal
 			// do not count their areas here as it doesn't matter
-			auto const set_invalid = [&]( auto x, auto y ) {
-				auto pos = grid( x, y );
-				if( pos < grid.common_v ) {
-					invalid_points[pos] = true;
-				}
-			};
+			{
+				auto const set_invalid = [&](auto x, auto y) {
+					auto pos = grid(x, y);
+					if (pos < grid.common_v) {
+						invalid_points[pos] = true;
+					}
+				};
 
-			for( int16_t x = grid.min_x( ); x < grid.max_x( ); ++x ) {
-				set_invalid( x, grid.min_y( ));
-				set_invalid( x, grid.max_y( ) - 1 );
-			}
-			for( int16_t y = grid.min_y( )+1; y <grid.max_y( )-1; ++y ) {
-				set_invalid( grid.min_x( ), y );
-				set_invalid( grid.max_x( ) - 1, y );
+				for (int16_t x = grid.min_x(); x < grid.max_x(); ++x) {
+					set_invalid(x, grid.min_y());
+					set_invalid(x, grid.max_y() - 1);
+				}
+				for (int16_t y = grid.min_y() + 1; y < grid.max_y() - 1; ++y) {
+					set_invalid(grid.min_x(), y);
+					set_invalid(grid.max_x() - 1, y);
+				}
 			}
 			std::array<size_t, N> areas{};
+			// Calc areas for non-permimiter grid locations
 			for( int16_t x = grid.min_x( ) + 1; x < grid.max_x( ) - 1; ++x ) {
 				for( int16_t y = grid.min_x( ) + 1; y < grid.max_x( ) -1 ; ++y ) {
 					if( grid( x, y ) < grid.no_value_v ) {
