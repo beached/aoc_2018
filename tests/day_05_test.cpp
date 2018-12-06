@@ -38,12 +38,12 @@ namespace daw {
 } // namespace daw
 
 int main( ) {
-	size_t result = *daw::bench_n_test<1000>( "Day 5, part 1", [&]( ) {
+	size_t result = *daw::bench_n_test<10>( "Day 5, part 1", [&]( ) {
 		return daw::alchemical_reduction<50'000>( daw::aoc_2018::day05::polymer );
 	} );
 	daw::expecting( 9154U, result );
 
-	result = *daw::bench_n_test<1000>( "Day 5, part 2", [&]( ) {
+	result = *daw::bench_n_test<10>( "Day 5, part 2", [&]( ) {
 		return daw::smallest<50'000>( daw::aoc_2018::day05::polymer );
 	} );
 	daw::expecting( 4556U, result );

@@ -43,7 +43,7 @@ namespace daw {
 	}
 
 	template<typename Container>
-	size_t get_checksum( Container &&ids ) {
+	constexpr size_t get_checksum( Container &&ids ) {
 		size_t two_of_same = 0;
 		size_t three_of_same = 0;
 		for( auto id : ids ) {

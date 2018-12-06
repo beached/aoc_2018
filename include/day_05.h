@@ -43,7 +43,7 @@ namespace daw {
 		}
 
 		template<size_t BuffSize, typename CharT>
-		constexpr size_t
+		size_t
 		alchemical_reduction( daw::basic_string_view<CharT> sv ) noexcept {
 			daw::basic_static_string<CharT, BuffSize> result{};
 
@@ -79,29 +79,29 @@ namespace daw {
 		}
 
 		template<size_t BuffSize, typename CharT>
-		constexpr size_t smallest( daw::basic_string_view<CharT> sv ) {
+		size_t smallest( daw::basic_string_view<CharT> sv ) {
 			// Find all unit types
 			constexpr auto const unit_types = []( ) {
 				std::array<char, 26> result{};
 				daw::algorithm::iota( begin( result ), end( result ), 'A' );
 				return result;
 			}( );
+			std::array<size_t, 26> results{};
+			for( auto &i : results ) {
+				i = std::numeric_limits<size_t>::max( );
+			}
 
-			return daw::algorithm::accumulate(
-			  begin( unit_types ), end( unit_types ),
-			  std::numeric_limits<size_t>::max( ),
-			  [sv]( auto cur_min, auto u ) {
-				  daw::basic_static_string<CharT, BuffSize> poly( sv.data( ), sv.size( ) );
-				  poly.erase( daw::algorithm::remove_if( poly.data( ), poly.data( ) + poly.size( ), [u]( auto c ) {
-					  return toupper( c ) == u;
-				  } ), end( poly ) );
-				  auto tmp = alchemical_reduction<BuffSize>(
-				    daw::string_view( poly.data( ), poly.size( ) ) );
-				  if( tmp < cur_min ) {
-					  return tmp;
-				  }
-				  return cur_min;
-			  } );
+			for( size_t n = 0; n < 26; ++n ) {
+				daw::basic_static_string<CharT, BuffSize> poly{};
+				daw::algorithm::copy_if(
+				  begin( sv ), end( sv ), daw::back_inserter( poly ),
+				  [&]( auto c ) { return toupper( c ) != unit_types[n]; } );
+
+				results[n] = alchemical_reduction<BuffSize>(
+				  daw::string_view( poly.data( ), poly.size( ) ) );
+			}
+
+			return *std::min_element( begin( results ), end( results ) );
 		}
 	} // namespace
 } // namespace daw
