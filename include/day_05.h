@@ -43,7 +43,7 @@ namespace daw {
 		}
 
 		template<size_t BuffSize, typename CharT>
-		size_t
+		constexpr size_t
 		alchemical_reduction( daw::basic_string_view<CharT> sv ) noexcept {
 			daw::basic_static_string<CharT, BuffSize> result{};
 
