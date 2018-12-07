@@ -1118,4 +1118,3 @@ int main( ) {
 	} );
 	daw::expecting( result, 7887U );
 }
-

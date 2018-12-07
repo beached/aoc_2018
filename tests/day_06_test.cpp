@@ -29,6 +29,16 @@ namespace daw {
 	namespace aoc_2018 {
 		namespace day06 {
 			using namespace daw::string_view_literals;
+
+			static constexpr auto const grid_pts_sm =
+					parse_grid( std::array<daw::string_view,6>{
+							"1, 1",
+							"1, 6",
+							"8, 3",
+							"3, 4",
+							"5, 5",
+							"8, 9"
+					});
 			static constexpr auto const grid_pts =
 			  parse_grid( std::array<daw::string_view, 50>{
 			    "152, 292", "163, 90",  "258, 65",  "123, 147", "342, 42",
@@ -46,8 +56,14 @@ namespace daw {
 } // namespace daw
 
 int main( ) {
-	auto const p1 = *daw::bench_n_test<100>( "Day 6, part 1", [&]( ) { return daw::part_01( daw::aoc_2018::day06::grid_pts ); } );
+	auto r = daw::part_01( daw::aoc_2018::day06::grid_pts_sm );
+	daw::expecting( 17, r );
+	auto const p1 = *daw::bench_n_test<1>( "Day 6, part 1", [&]( ) {
+		return daw::part_01( daw::aoc_2018::day06::grid_pts );
+	} );
 	daw::expecting( 3687U, p1 );
-	auto const p2 = *daw::bench_n_test<100>( "Day 6, part2", [&]( ) { return daw::part_02<10'000>( daw::aoc_2018::day06::grid_pts ); } );
+	auto const p2 = *daw::bench_n_test<1>( "Day 6, part2", [&]( ) {
+		return daw::part_02<10'000>( daw::aoc_2018::day06::grid_pts );
+	} );
 	daw::expecting( 40134U, p2 );
 }
