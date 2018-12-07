@@ -31,12 +31,6 @@ link_directories( ${Boost_LIBRARY_DIRS} )
 add_definitions( -DBOOST_TEST_DYN_LINK -DBOOST_ALL_NO_LIB -DBOOST_ALL_DYN_LINK )
 
 set( HEADER_FILES
-	${HEADER_FOLDER}/day_01.h
-	${HEADER_FOLDER}/day_02.h
-	${HEADER_FOLDER}/day_03.h
-	${HEADER_FOLDER}/day_04.h
-	${HEADER_FOLDER}/day_05.h
-	${HEADER_FOLDER}/day_06.h
 )
 
 set( SOURCE_FILES
@@ -46,21 +40,24 @@ set( SOURCE_FILES
 #add_library ( aoc_2018_lib STATIC ${HEADER_FILES} ${SOURCE_FILES} )
 #add_dependencies( aoc_2018_lib dependency_stub )
 
-add_executable( day_01_test ${HEADER_FILES} ${TEST_FOLDER}/day_01_test.cpp )
+add_executable( day_01_test ${HEADER_FOLDER}/day_01.h ${HEADER_FILES} ${TEST_FOLDER}/day_01_test.cpp )
 target_link_libraries( day_01_test ${Boost_LIBRARIES} ${CMAKE_DL_LIBS} ${COMPILER_SPECIFIC_LIBS} ${CMAKE_THREAD_LIBS_INIT} )
 
-add_executable( day_02_test ${HEADER_FILES} ${TEST_FOLDER}/day_02_test.cpp )
+add_executable( day_02_test ${HEADER_FOLDER}/day_02.h ${HEADER_FILES} ${TEST_FOLDER}/day_02_test.cpp )
 target_link_libraries( day_02_test ${CMAKE_DL_LIBS} ${COMPILER_SPECIFIC_LIBS} ${CMAKE_THREAD_LIBS_INIT} )
 
-add_executable( day_03_test ${HEADER_FILES} ${TEST_FOLDER}/day_03_test.cpp )
+add_executable( day_03_test ${HEADER_FOLDER}/day_03.h ${HEADER_FILES} ${TEST_FOLDER}/day_03_test.cpp )
 target_link_libraries( day_03_test ${CMAKE_DL_LIBS} ${COMPILER_SPECIFIC_LIBS} ${CMAKE_THREAD_LIBS_INIT} )
 
-add_executable( day_04_test ${HEADER_FILES} ${TEST_FOLDER}/day_04_test.cpp )
+add_executable( day_04_test ${HEADER_FOLDER}/day_04.h ${HEADER_FILES} ${TEST_FOLDER}/day_04_test.cpp )
 target_link_libraries( day_04_test ${CMAKE_DL_LIBS} ${COMPILER_SPECIFIC_LIBS} ${CMAKE_THREAD_LIBS_INIT} )
 
-add_executable( day_05_test ${HEADER_FILES} ${TEST_FOLDER}/day_05_test.cpp )
+add_executable( day_05_test ${HEADER_FOLDER}/day_05.h ${HEADER_FILES} ${TEST_FOLDER}/day_05_test.cpp )
 target_link_libraries( day_05_test ${CMAKE_DL_LIBS} ${COMPILER_SPECIFIC_LIBS} ${CMAKE_THREAD_LIBS_INIT} )
 
-add_executable( day_06_test ${HEADER_FILES} ${TEST_FOLDER}/day_06_test.cpp )
+add_executable( day_06_test ${HEADER_FOLDER}/day_06.h ${HEADER_FILES} ${TEST_FOLDER}/day_06_test.cpp )
 target_link_libraries( day_06_test ${CMAKE_DL_LIBS} ${COMPILER_SPECIFIC_LIBS} ${CMAKE_THREAD_LIBS_INIT} )
+
+add_executable( day_07_test ${HEADER_FOLDER}/day_07.h ${HEADER_FILES} ${TEST_FOLDER}/day_07_test.cpp )
+target_link_libraries( day_07_test ${CMAKE_DL_LIBS} ${COMPILER_SPECIFIC_LIBS} ${CMAKE_THREAD_LIBS_INIT} )
 
