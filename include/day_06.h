@@ -309,16 +309,6 @@ namespace daw {
 				}
 			}
 			return total;
-			/*
-			return daw::algorithm::accumulate(
-			  std::begin( grid ), std::end( grid ), 0ULL, []( auto tot, auto i ) {
-			    if( i < static_cast<index_t>( MaxDistance ) ) {
-			      return tot + 1;
-			    }
-			    return tot;
-			  } );
-			  */
 		}
-
 	} // namespace
 } // namespace daw
