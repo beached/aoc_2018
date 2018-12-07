@@ -184,7 +184,7 @@ namespace daw {
 			return results;
 		}
 
-		constexpr intmax_t man_distance( point_t a, point_t b ) noexcept {
+		constexpr size_t man_distance( point_t a, point_t b ) noexcept {
 			if( b.x > a.x ) {
 				std::swap( b.x, a.x );
 			}
@@ -193,7 +193,7 @@ namespace daw {
 			}
 			auto const x = a.x - b.x;
 			auto const y = a.y - b.y;
-			return x + y;
+			return static_cast<size_t>( x + y );
 		}
 
 		struct p_compare {
@@ -297,13 +297,13 @@ namespace daw {
 			auto const max_pos = 575;
 			for( index_t x = min_pos; x < max_pos; ++x ) {
 				for( index_t y = min_pos; y < max_pos; ++y ) {
-					auto tmp = daw::algorithm::accumulate(
-					  begin( coords.points ), end( coords.points ), 0LL,
+					auto const tmp = daw::algorithm::accumulate(
+					  begin( coords.points ), end( coords.points ), 0ULL,
 					  [pt = point_t{x, y}]( auto tot, auto pt2 ) {
 						  tot += man_distance( pt, pt2 );
 						  return tot;
 					  } );
-					if( static_cast<size_t>( tmp ) < MaxDistance ) {
+					if( tmp < MaxDistance ) {
 						++total;
 					}
 				}
