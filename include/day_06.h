@@ -52,8 +52,10 @@ namespace daw {
 
 		template<index_t Max_x, index_t Max_y, index_t Min_x = 0, index_t Min_y = 0>
 		struct grid_t {
-			static inline constexpr size_t const width = Max_x - Min_x;
-			static inline constexpr size_t const height = Max_y - Min_y;
+			static inline constexpr size_t const width =
+			  static_cast<size_t>( Max_x - Min_x );
+			static inline constexpr size_t const height =
+			  static_cast<size_t>( Max_y - Min_y );
 
 			static_assert( width > 0 );
 			static_assert( height > 0 );
@@ -65,6 +67,20 @@ namespace daw {
 			using reference = value_type &;
 			using const_reference = value_type const &;
 
+		private:
+			using values_type = std::array<value_type, m_size>;
+
+			values_type m_values{};
+
+			static constexpr size_t location( size_type x, size_type y ) noexcept {
+				return static_cast<size_t>( x - Min_x ) +
+				       ( static_cast<size_t>( y - Min_y ) * width );
+			}
+
+		public:
+			using iterator = typename values_type::iterator;
+			using const_iterator = typename values_type::const_iterator;
+
 			// Some sentinals
 			static inline constexpr auto const no_value_v =
 			  std::numeric_limits<value_type>::max( );
@@ -72,10 +88,8 @@ namespace daw {
 			static inline constexpr auto const common_v =
 			  std::numeric_limits<value_type>::max( ) - 1;
 
-			std::array<value_type, m_size> m_values{};
-
 			constexpr bool has_value( index_t x, index_t y ) const noexcept {
-				return operator()( x, y ) < common_v;
+				return operator( )( x, y ) < common_v;
 			}
 
 			constexpr bool is_empty( index_t x, index_t y ) const noexcept {
@@ -99,22 +113,41 @@ namespace daw {
 			}
 
 			constexpr grid_t( ) noexcept {
-				for( auto &v : m_values ) {
-					v = no_value_v;
-				}
+				daw::algorithm::fill( std::begin( m_values ), std::end( m_values ),
+				                      no_value_v );
 			}
 
 			constexpr reference operator( )( size_type x, size_type y ) noexcept {
-				return m_values[static_cast<size_t>( x - Min_x ) +
-				                ( static_cast<size_t>( y - Min_y ) *
-				                  static_cast<size_t>( width ) )];
+				return m_values[location( x, y )];
 			}
 
 			constexpr const_reference operator( )( size_type x, size_type y ) const
 			  noexcept {
-				return m_values[static_cast<size_t>( x - Min_x ) +
-				                ( static_cast<size_t>( y - Min_y ) *
-				                  static_cast<size_t>( width ) )];
+				return m_values[location( x, y )];
+			}
+
+			constexpr iterator begin( ) noexcept {
+				return std::begin( m_values );
+			}
+
+			constexpr const_iterator begin( ) const noexcept {
+				return std::begin( m_values );
+			}
+
+			constexpr const_iterator cbegin( ) const noexcept {
+				return std::cbegin( m_values );
+			}
+
+			constexpr iterator end( ) noexcept {
+				return std::end( m_values );
+			}
+
+			constexpr const_iterator end( ) const noexcept {
+				return std::end( m_values );
+			}
+
+			constexpr const_iterator cend( ) const noexcept {
+				return std::cend( m_values );
 			}
 		};
 
@@ -129,6 +162,7 @@ namespace daw {
 				  sv = daw::parser::trim_left( sv );
 				  auto x = daw::parser::parse_unsigned_int<index_t>(
 				    sv.pop_front( sv.find_first_of( ',' ) ) );
+
 				  sv.remove_prefix( );
 				  sv = daw::parser::trim_left( sv );
 				  auto y = daw::parser::parse_unsigned_int<index_t>(
@@ -163,45 +197,20 @@ namespace daw {
 		}
 
 		struct p_compare {
-			using value_t = std::pair<intmax_t, index_t>;
-
-			constexpr bool operator( )( value_t const & lhs, value_t const & rhs ) const noexcept {
+			template<typename T, typename U>
+			constexpr bool operator( )( T &&lhs, U &&rhs ) const {
 				return lhs.second < rhs.second;
 			}
 		};
 
-		template<size_t N>
-		constexpr auto part_01( point_array_t<N> const &coords ) {
-			static_assert( N >= 2 );
-			grid_t<360, 360> grid{};
-			for( index_t x = grid.min_x( ); x < grid.max_x( ); ++x ) {
-				for( index_t y = grid.min_y( ); y < grid.max_y( ); ++y ) {
-					std::array<std::pair<size_t, index_t>, N> man_distances{};
-					auto const pt = point_t{x, y};
-					for( size_t n = 0; n < coords.points.size( ); ++n ) {
-						man_distances[n] =
-						  std::make_pair( n, man_distance( pt, coords.points[n] ) );
-					}
-
-					daw::keep_n<std::pair<intmax_t, index_t>, 2, daw::keep_n_order::ascending, p_compare> two_smallest( {0LL, std::numeric_limits<index_t>::max() } );
-
-					for( auto const & d: man_distances ) {
-						two_smallest.insert( d );
-					}
-
-					if( two_smallest.front( ) == two_smallest.back( ) ) {
-						grid( x, y ) = grid.common_v;
-					} else {
-						grid( x, y ) = two_smallest[0].first;
-					}
-				}
-			}
+		template<size_t N, typename Grid>
+		constexpr std::array<bool, N> find_invalid_points( Grid &&grid ) {
 			std::array<bool, N> invalid_points{};
 			// All perimiter points are for removal
 			// do not count their areas here as it doesn't matter
 			{
 				auto const set_invalid = [&]( index_t x, index_t y ) {
-					if( grid.has_value( x, y) ) {
+					if( grid.has_value( x, y ) ) {
 						invalid_points[static_cast<size_t>( grid( x, y ) )] = true;
 					}
 				};
@@ -215,6 +224,42 @@ namespace daw {
 					set_invalid( grid.max_x( ) - 1, y );
 				}
 			}
+			return invalid_points;
+		}
+
+		template<intmax_t Max_x, intmax_t Max_y, size_t N>
+		constexpr grid_t<Max_x, Max_y>
+		calc_distances( point_array_t<N> const &coords ) {
+			grid_t<360, 360> grid{};
+			using dist_item_t = std::pair<intmax_t, index_t>;
+			for( index_t x = grid.min_x( ); x < grid.max_x( ); ++x ) {
+				for( index_t y = grid.min_y( ); y < grid.max_y( ); ++y ) {
+					auto const pt = point_t{x, y};
+
+					daw::keep_n<dist_item_t, 2, daw::keep_n_order::ascending, p_compare>
+					  two_smallest( {0ULL, std::numeric_limits<index_t>::max( )} );
+
+					for( size_t n = 0; n < coords.points.size( ); ++n ) {
+						two_smallest.insert( {n, man_distance( pt, coords.points[n] )} );
+					}
+
+					if( two_smallest.front( ).second == two_smallest.back( ).second ) {
+						grid( x, y ) = grid.common_v;
+					} else {
+						grid( x, y ) = two_smallest[0].first;
+					}
+				}
+			}
+			return grid;
+		}
+
+		template<size_t N>
+		constexpr auto part_01( point_array_t<N> const &coords ) {
+			static_assert( N >= 2 );
+
+			auto const grid = calc_distances<360, 360>( coords );
+			auto const invalid_points = find_invalid_points<N>( grid );
+
 			std::array<size_t, N> areas{};
 			// Calc areas for non-permimiter grid locations
 			for( index_t x = grid.min_x( ) + 1; x < grid.max_x( ) - 1; ++x ) {
@@ -247,25 +292,32 @@ namespace daw {
 
 		template<size_t MaxDistance, size_t N>
 		constexpr auto part_02( point_array_t<N> const &coords ) {
-			grid_t<575, 575, -200, -200> grid{};
-			for( index_t x = grid.min_x( ); x < grid.max_x( ); ++x ) {
-				for( index_t y = grid.min_x( ); y < grid.max_y( ); ++y ) {
-					grid( x, y ) = daw::algorithm::accumulate(
+			size_t total = 0;
+			auto const min_pos = -200;
+			auto const max_pos = 575;
+			for( index_t x = min_pos; x < max_pos; ++x ) {
+				for( index_t y = min_pos; y < max_pos; ++y ) {
+					auto tmp = daw::algorithm::accumulate(
 					  begin( coords.points ), end( coords.points ), 0LL,
 					  [pt = point_t{x, y}]( auto tot, auto pt2 ) {
 						  tot += man_distance( pt, pt2 );
 						  return tot;
 					  } );
+					if( static_cast<size_t>( tmp ) < MaxDistance ) {
+						++total;
+					}
 				}
 			}
-			return daw::algorithm::accumulate( begin( grid.m_values ),
-			                                   end( grid.m_values ), 0ULL,
-			                                   []( auto tot, auto i ) {
-				                                   if( i < static_cast<index_t>( MaxDistance ) ) {
-					                                   return tot + 1;
-				                                   }
-				                                   return tot;
-			                                   } );
+			return total;
+			/*
+			return daw::algorithm::accumulate(
+			  std::begin( grid ), std::end( grid ), 0ULL, []( auto tot, auto i ) {
+			    if( i < static_cast<index_t>( MaxDistance ) ) {
+			      return tot + 1;
+			    }
+			    return tot;
+			  } );
+			  */
 		}
 
 	} // namespace

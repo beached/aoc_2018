@@ -4,10 +4,8 @@ project( dependency_prj )
 
 find_package( Boost 1.58.0 COMPONENTS system iostreams filesystem regex unit_test_framework REQUIRED )
 
-set( CMAKE_CXX_STANDARD 2a CACHE STRING "The C++ standard whose features are requested.")
-add_definitions( -DBOOST_TEST_DYN_LINK -DBOOST_ALL_NO_LIB -DBOOST_ALL_DYN_LINK )
-
 include( "CMakeListsCompiler.txt" )
+add_definitions( -DBOOST_TEST_DYN_LINK -DBOOST_ALL_NO_LIB -DBOOST_ALL_DYN_LINK )
 
 include_directories( "./include" )
 include_directories( SYSTEM ${Boost_INCLUDE_DIRS} )

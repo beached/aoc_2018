@@ -1,14 +1,11 @@
 cmake_minimum_required(VERSION 3.10)
 project( aoc_2018 )
 
-set(CMAKE_CXX_STANDARD 17)
-
 find_package( Boost 1.58.0 COMPONENTS system iostreams filesystem regex unit_test_framework REQUIRED )
 
-set( CMAKE_CXX_STANDARD 17 CACHE STRING "The C++ standard whose features are requested.")
-add_definitions( -DBOOST_TEST_DYN_LINK -DBOOST_ALL_NO_LIB -DBOOST_ALL_DYN_LINK )
-
 include( "${CMAKE_SOURCE_DIR}/dependent_projects/CMakeListsCompiler.txt" )
+
+add_definitions( -DBOOST_TEST_DYN_LINK -DBOOST_ALL_NO_LIB -DBOOST_ALL_DYN_LINK )
 
 if( EXISTS "${CMAKE_SOURCE_DIR}/dependent_projects/build" )
 	add_custom_target( dependency_stub )
