@@ -38,7 +38,7 @@ namespace daw {
 			char child;
 		};
 
-		constexpr bool operator<( reqs_t const & lhs, reqs_t const & rhs ) noexcept {
+		constexpr bool operator<( reqs_t const &lhs, reqs_t const &rhs ) noexcept {
 			return lhs.parent < rhs.parent;
 		}
 
@@ -51,7 +51,8 @@ namespace daw {
 			//            1         2         3
 			daw::algorithm::transform( begin( req_strs ), end( req_strs ),
 			                           result.begin( ), []( auto sv ) -> reqs_t {
-				                           return {static_cast<char>( sv[5] - 'A' ), static_cast<char>( sv[36] - 'A' )};
+				                           return {static_cast<char>( sv[5] - 'A' ),
+				                                   static_cast<char>( sv[36] - 'A' )};
 			                           } );
 
 			return result;
@@ -63,7 +64,8 @@ namespace daw {
 			std::set<char> children{};
 			bool visited = false;
 
-			node_t( ) noexcept: self( -1 ) { }
+			node_t( ) noexcept
+			  : self( -1 ) {}
 
 			node_t( char Self ) noexcept
 			  : self( Self ) {}
@@ -77,28 +79,34 @@ namespace daw {
 			}
 		};
 
-		bool operator<( node_t const & lhs, node_t const & rhs ) noexcept {
+		bool operator<( node_t const &lhs, node_t const &rhs ) noexcept {
 			return lhs.self < rhs.self;
 		}
 
-		inline std::string walk( std::map<int, node_t> & nodes, char id ) {
-			auto & node = nodes[id];
-			if( node.visited ) {
-				return {};
-			}
-			node.visited = true;
+		inline std::string walk( std::map<int, node_t> &nodes, char id,
+		                         intmax_t depth ) {
+			auto &node = nodes[id];
+			bool const visited = node.visited;
 			std::string result{};
+			/*
 			for( auto & parent: node.parents ) {
-					result += walk( nodes, parent );
+			    result += walk( nodes, parent );
 			}
-			result += id + 'A';
-			for( auto & child: node.children ) {
-				result += walk( nodes, child );
+			 */
+			if( depth == 0 ) {
+				if( !visited ) {
+					node.visited = true;
+					result += id + 'A';
+				}
+			} else {
+				for( auto &child : node.children ) {
+					result += walk( nodes, child, --depth );
+				}
 			}
 			return result;
 		}
 
-		void add_child ( std::map<int, node_t> & nodes, char parent, char child ) {
+		void add_child( std::map<int, node_t> &nodes, char parent, char child ) {
 			std::cout << nodes.size( ) << '\n';
 			if( nodes.count( parent ) == 0 ) {
 				nodes[parent].self = parent;
@@ -117,23 +125,97 @@ namespace daw {
 			std::sort( begin( reqs ), end( reqs ) );
 			std::map<int, node_t> nodes{};
 
-			for( auto const & req: reqs ) {
+			for( auto const &req : reqs ) {
 				add_child( nodes, req.parent, req.child );
 			}
 
-			auto const find_root_nodes = []( auto const & n ) {
-				auto const & node = n.second;
-				return !node.walked and node.parents.empty( );
+			auto const find_root_nodes = []( auto const &n ) {
+				auto const &node = n.second;
+				return !node.visited and node.parents.empty( );
 			};
 
+			std::set<char> S{};
+			for( auto const &node : nodes ) {
+				if( node.second.parents.empty( ) ) {
+					S.insert( node.second.self );
+				}
+			}
+
+			auto cur_nodes = nodes;
 			std::string result{};
-			for( auto const & req: reqs ) {
-				if( !nodes[req.parent].walked and nodes[req.parent].parents.empty( ) ) {
-					result += walk( nodes, req.parent );
+			while( !S.empty( ) ) {
+				auto n = cur_nodes[*std::begin( S )];
+				S.erase( n.self );
+				result.push_back( n.self + 'A' );
+				for( auto &m_id : cur_nodes[n.self].children ) {
+					auto &m = cur_nodes[m_id];
+					m.parents.erase( n.self );
+					n.children.erase( m.self );
+					if( m.parents.empty( ) ) {
+						S.insert( m.self );
+					}
+				}
+			}
+
+			return result;
+		}
+
+		template<size_t BaseTime = 60, size_t NumWorkers = 5, size_t N>
+		size_t part_02( std::array<reqs_t, N> reqs ) {
+			std::sort( begin( reqs ), end( reqs ) );
+
+			std::map<char, std::set<char>> nodes{};
+
+			for( reqs_t const &req : reqs ) {
+				nodes[req.child].insert( req.parent );
+				if( nodes.count( req.parent ) == 0 ) {
+					nodes[req.parent] = {};
+				}
+			}
+
+			std::map<char, std::set<char>> S{};
+			for( auto &node : nodes ) {
+				if( node.second.empty( ) ) {
+					S[node.first] = node.second;
+				}
+			}
+
+			std::string L{};
+			while( !S.empty( ) ) {
+				auto n = *std::begin( S );
+				S.erase( n.first );
+				L.push_back( n.first + 'A' );
+				for( auto m_id : nodes[n.first] ) {
+					auto & m = nodes[m_id];
+					if( m.empty( ) ) {
+						S[m_id] = {};
+					}
+				}
+			}
+			struct work_item_t {
+				char id;
+				size_t load;
+			};
+
+			auto const pop_front = []( auto & container ) {
+				auto result = *std::begin( container );
+				container.erase( container.begin( ) );
+				return result;
+			};
+
+			size_t result = 0;
+			std::vector<work_item_t> workers{};
+			while( !L.empty( ) ) {
+				++result;
+				for( auto & w: workers ) {
+					if( w.load == 0 and !L.empty( ) ) {
+						auto d = pop_front( L );
+						w.id = d;
+						w.load = static_cast<size_t>(d - 'A') + 1U + BaseTime;
+					}
 				}
 			}
 			return result;
 		}
-
 	} // namespace
 } // namespace daw
