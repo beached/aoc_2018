@@ -38,6 +38,10 @@ namespace daw {
 			char child;
 		};
 
+		constexpr bool operator<( reqs_t const & lhs, reqs_t const & rhs ) noexcept {
+			return lhs.parent < rhs.parent;
+		}
+
 		template<size_t N>
 		constexpr std::array<reqs_t, N>
 		process_reqs( std::array<daw::string_view, N> req_strs ) noexcept {
@@ -47,86 +51,88 @@ namespace daw {
 			//            1         2         3
 			daw::algorithm::transform( begin( req_strs ), end( req_strs ),
 			                           result.begin( ), []( auto sv ) -> reqs_t {
-				                           return {sv[5], sv[36]};
+				                           return {static_cast<char>( sv[5] - 'A' ), static_cast<char>( sv[36] - 'A' )};
 			                           } );
+
 			return result;
 		}
 
 		struct node_t {
 			char self;
-			std::vector<char> parents{};
-			std::vector<char> children{};
+			std::set<char> parents{};
+			std::set<char> children{};
 			bool walked = false;
+
+			node_t( ) noexcept: self( -1 ) { }
 
 			node_t( char Self ) noexcept
 			  : self( Self ) {}
 
 			void add_child( char c ) {
-				children.push_back( c - 'A' );
+				children.insert( c );
 			}
 
 			void add_parent( char c ) {
-				parents.push_back( c - 'A' );
+				parents.insert( c );
 			}
 		};
 
-		template<size_t Count>
-		std::string walk( std::array<std::optional<node_t>, Count> &priorities,
-		                  size_t N ) {
-			auto &node = priorities[N];
-			if( !node ) {
+		bool operator<( node_t const & lhs, node_t const & rhs ) noexcept {
+			return lhs.self < rhs.self;
+		}
+
+		inline std::string walk( std::map<int, node_t> & nodes, char id ) {
+			auto & node = nodes[id];
+			if( node.walked ) {
 				return {};
 			}
-			if( node->walked ) {
-				return {};
-			}
-			node->walked = true;
+			node.walked = true;
 			std::string result{};
-			for( auto const &parent : node->parents ) {
-				if( priorities[static_cast<size_t>( parent )]->walked ) {
-					continue;
-				}
-				result += walk( priorities, static_cast<size_t>( parent ) );
+			for( auto & parent: node.parents ) {
+					result += walk( nodes, parent );
 			}
-			result.push_back( 'A' + static_cast<char>( N ) );
+			result += id + 'A';
+			for( auto & child: node.children ) {
+				result += walk( nodes, child );
+			}
 			return result;
 		}
 
-		struct pnode_t {
-			size_t self;
-			bool has_parent = false;
-			std::vector<size_t> children{};
+		void add_child ( std::map<int, node_t> & nodes, char parent, char child ) {
+			std::cout << nodes.size( ) << '\n';
+			if( nodes.count( parent ) == 0 ) {
+				nodes[parent].self = parent;
+			}
+			nodes[parent].add_child( child );
 
-			pnode_t( size_t id ) noexcept: self( id ) { }
+			if( nodes.count( child ) == 0 ) {
+				nodes[child].self = child;
+			}
+			nodes[child].add_parent( parent );
+			std::cout << nodes.size( ) << '\n';
 		};
 
 		template<size_t N>
-		std::string part_01( std::array<reqs_t, N> const &reqs ) {
-			std::vector<pnode_t> nodes{};
-
-			auto const find_node = [&]( char k ) -> std::optional<size_t> {
-				k -= 'A';
-				auto pos = std::find_if( begin( nodes ), end( nodes ), [k]( auto v ) {
-					return k == v.self;
-				});
-				if( pos == end( nodes ) ) {
-					return {};
-				}
-				return static_cast<size_t>( std::distance( begin( nodes ), pos ) );
-			};
-
-			auto const add_child = [&]( char parent, char child ) {
-				parent -= 'A';
-				child -= 'A';
-				
-			};
+		std::string part_01( std::array<reqs_t, N> reqs ) {
+			std::sort( begin( reqs ), end( reqs ) );
+			std::map<int, node_t> nodes{};
 
 			for( auto const & req: reqs ) {
-				auto node = find_node( reqs.parent );
-				if( !node ) {
-					nodes.emplace_back( reqs.parent );
+				add_child( nodes, req.parent, req.child );
+			}
+
+			auto const find_root_nodes = []( auto const & n ) {
+				auto const & node = n.second;
+				return !node.walked and node.parents.empty( );
+			};
+
+			std::string result{};
+			for( auto const & req: reqs ) {
+				if( !nodes[req.parent].walked and nodes[req.parent].parents.empty( ) ) {
+					result += walk( nodes, req.parent );
 				}
 			}
+			return result;
 		}
 
 	} // namespace
