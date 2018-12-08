@@ -61,7 +61,7 @@ namespace daw {
 			char self;
 			std::set<char> parents{};
 			std::set<char> children{};
-			bool walked = false;
+			bool visited = false;
 
 			node_t( ) noexcept: self( -1 ) { }
 
@@ -83,10 +83,10 @@ namespace daw {
 
 		inline std::string walk( std::map<int, node_t> & nodes, char id ) {
 			auto & node = nodes[id];
-			if( node.walked ) {
+			if( node.visited ) {
 				return {};
 			}
-			node.walked = true;
+			node.visited = true;
 			std::string result{};
 			for( auto & parent: node.parents ) {
 					result += walk( nodes, parent );
