@@ -222,12 +222,10 @@ namespace daw {
 			auto const work_to_do = [&]( ) {
 				return !S.empty( ) or !work_queue.empty( );
 			};
-			auto const need_to_wait = [&]( ) {
-				return !work_queue.has_room( tick );
-			};
+			auto const need_to_wait = [&]( ) { return !work_queue.has_room( tick ); };
 			auto const completed_work = [&]( ) {
 				std::vector<graph_node_t<char>> result{};
-				for( work_item<BaseTime, char> & w: work_queue.workers ) {
+				for( work_item<BaseTime, char> &w : work_queue.workers ) {
 					if( w.done( tick ) ) {
 						auto n = w.remove_node( );
 						if( n ) {
@@ -247,20 +245,20 @@ namespace daw {
 				while( !old_items.empty( ) ) {
 					graph_node_t<char> old_node = std::move( old_items.back( ) );
 					old_items.pop_back( );
-					for (graph_node_t<char> child :
-							get_sorted_edges(graph, old_node)) {
+					for( graph_node_t<char> child :
+					     get_sorted_edges( graph, old_node ) ) {
 
-						graph.remove_edges(old_node.id(), child.id());
-						if (child.incoming_edges().empty()) {
-							S.insert(child);
+						graph.remove_edges( old_node.id( ), child.id( ) );
+						if( child.incoming_edges( ).empty( ) ) {
+							S.insert( child );
 						}
 					}
 				}
-				while(!S.empty( ) and work_queue.has_room( tick ) ) {
-					auto q = work_queue.find_free_queue(tick);
+				while( !S.empty( ) and work_queue.has_room( tick ) ) {
+					auto q = work_queue.find_free_queue( tick );
 					result_str.push_back( std::begin( S )->value( ) );
-					*q = work_item<BaseTime, char>(tick, *std::begin(S));
-					S.erase(S.begin());
+					*q = work_item<BaseTime, char>( tick, *std::begin( S ) );
+					S.erase( S.begin( ) );
 				}
 				++tick;
 			}

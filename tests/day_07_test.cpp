@@ -134,15 +134,15 @@ namespace daw {
 			    "Step T must be finished before step E can begin.",
 			    "Step D must be finished before step F can begin."} );
 
-			static constexpr auto const little_reqs = daw::process_reqs( std::array<daw::string_view, 7>{
-					"Step C must be finished before step A can begin.",
-					"Step C must be finished before step F can begin.",
-					"Step A must be finished before step B can begin.",
-					"Step A must be finished before step D can begin.",
-					"Step B must be finished before step E can begin.",
-					"Step D must be finished before step E can begin.",
-					"Step F must be finished before step E can begin."
-			});
+			static constexpr auto const little_reqs =
+			  daw::process_reqs( std::array<daw::string_view, 7>{
+			    "Step C must be finished before step A can begin.",
+			    "Step C must be finished before step F can begin.",
+			    "Step A must be finished before step B can begin.",
+			    "Step A must be finished before step D can begin.",
+			    "Step B must be finished before step E can begin.",
+			    "Step D must be finished before step E can begin.",
+			    "Step F must be finished before step E can begin."} );
 		} // namespace day07
 	}   // namespace aoc_2018
 } // namespace daw
@@ -158,14 +158,11 @@ int main( ) {
 	} );
 	daw::expecting( "GJKLDFNPTMQXIYHUVREOZSAWCB", p1 );
 
-
 	auto little_p2 = daw::part_02<0, 2>( daw::aoc_2018::day07::little_reqs );
 	daw::expecting( 15, little_p2 );
-
 
 	auto const p2 = *daw::bench_n_test<1>( "Day 7, part 1", [&]( ) {
 		return daw::part_02( daw::aoc_2018::day07::requirements );
 	} );
 	daw::expecting( p2, p2 );
-
 }
