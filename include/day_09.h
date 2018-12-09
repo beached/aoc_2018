@@ -33,6 +33,16 @@
 
 namespace daw {
 	namespace {
+		template<typename CharT>
+		auto part_01( daw::basic_string_view<CharT> sv ) {
+			return 0;
+		}
 
+		template<typename CharT>
+		auto part_02( daw::basic_string_view<CharT> sv ) {
+			return 0;
+		}
+		
+		
 	}
 } // namespace daw

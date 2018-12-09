@@ -23,26 +23,27 @@
 #include <daw/daw_benchmark.h>
 #include <daw/daw_string_view.h>
 
-#include "day_08.h"
+#include "day_09.h"
 
 namespace daw {
 	namespace aoc_2018 {
 		namespace day09 {
 			using namespace daw::string_view_literals;
 
+			static constexpr auto data = ""_sv;
 		} // namespace day09
 	}   // namespace aoc_2018
 } // namespace daw
 
 int main( ) {
 	auto const p1 = *daw::bench_n_test<1>( "Day 9, part 1", [&]( ) {
-		return 0;//daw::part_01( daw::aoc_2018::day09::data );
+		return daw::part_01( daw::aoc_2018::day09::data );
 
 	} );
 	daw::expecting( p1, p1 );
 
 	auto const p2 = *daw::bench_n_test<1>( "Day 9, part 2", [&]( ) {
-		return 0;//daw::part_02( daw::aoc_2018::day09::data );
+		return daw::part_02( daw::aoc_2018::day09::data );
 	} );
 	daw::expecting( p2, p2 );
 
