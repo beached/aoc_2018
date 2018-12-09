@@ -25,32 +25,20 @@
 
 #include "day_09.h"
 
-namespace daw {
-	namespace aoc_2018 {
-		namespace day09 {
-			using namespace daw::string_view_literals;
-
-			static constexpr auto data = ""_sv;
-		} // namespace day09
-	}   // namespace aoc_2018
-} // namespace daw
-
 int main( ) {
 	auto test_001 = daw::day_09_solver<9U, 25U>( );
 	daw::expecting( 32U, test_001 );
 	auto test_002 = daw::day_09_solver<10U, 1618U>( );
 	daw::expecting( 8317U, test_002 );
-	auto test_003 = daw::day_09_solver<13U, 7999U>();
+	auto test_003 = daw::day_09_solver<13U, 7999U>( );
 	daw::expecting( 146373U, test_003 );
 
-	auto const p1 = *daw::bench_n_test<10>( "Day 9, part 1", [&]( ) {
-		return daw::day_09_solver<459U, 72'103U>();
-	} );
+	auto const p1 = *daw::bench_n_test<10>(
+	  "Day 9, part 1", [&]( ) { return daw::day_09_solver<459U, 72'103U>( ); } );
 	daw::expecting( 388131U, p1 );
 
 	auto const p2 = *daw::bench_n_test<10>( "Day 9, part 2", [&]( ) {
-		return daw::day_09_solver<459U, 7'210'300U>();
+		return daw::day_09_solver<459U, 7'210'300U>( );
 	} );
 	daw::expecting( 3239376988ULL, p2 );
-
 }
