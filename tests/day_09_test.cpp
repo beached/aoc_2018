@@ -36,13 +36,10 @@ namespace daw {
 } // namespace daw
 
 int main( ) {
-	/*
-	auto test_001 = daw::part_01<9U, 25U>( );
+	auto test_001 = daw::day_09_solver<9U, 25U>( );
 	daw::expecting( 32U, test_001 );
-
 	auto test_002 = daw::day_09_solver<10U, 1618U>( );
 	daw::expecting( 8317U, test_002 );
-	*/
 	auto test_003 = daw::day_09_solver<13U, 7999U>();
 	daw::expecting( 146373U, test_003 );
 
