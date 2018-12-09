@@ -236,7 +236,6 @@ namespace daw {
 				return result;
 			};
 
-			std::string result_str{};
 			while( work_to_do( ) ) {
 				while( need_to_wait( ) ) {
 					++tick;
@@ -256,7 +255,6 @@ namespace daw {
 				}
 				while( !S.empty( ) and work_queue.has_room( tick ) ) {
 					auto q = work_queue.find_free_queue( tick );
-					result_str.push_back( std::begin( S )->value( ) );
 					*q = work_item<BaseTime, char>( tick, *std::begin( S ) );
 					S.erase( S.begin( ) );
 				}
