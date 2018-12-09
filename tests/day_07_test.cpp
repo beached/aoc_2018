@@ -148,23 +148,24 @@ namespace daw {
 } // namespace daw
 
 int main( ) {
-	auto const little = *daw::bench_n_test<10>( "Day 7, part 1 example", [&]( ) {
+	auto const little = *daw::bench_n_test<1>( "Day 7, part 1 example", [&]( ) {
 		return daw::part_01( daw::aoc_2018::day07::little_reqs );
 	} );
 	daw::expecting( "CABDFE", little );
 
-	auto const p1 = *daw::bench_n_test<10>( "Day 7, part 1", [&]( ) {
+	auto const p1 = *daw::bench_n_test<1>( "Day 7, part 1", [&]( ) {
 		return daw::part_01( daw::aoc_2018::day07::requirements );
 	} );
 	daw::expecting( "GJKLDFNPTMQXIYHUVREOZSAWCB", p1 );
 
-	/*
+
 	auto little_p2 = daw::part_02<0, 2>( daw::aoc_2018::day07::little_reqs );
-//	daw::expecting( 15, little_p2 );
+	daw::expecting( 15, little_p2 );
+
 
 	auto const p2 = *daw::bench_n_test<1>( "Day 7, part 1", [&]( ) {
 		return daw::part_02( daw::aoc_2018::day07::requirements );
 	} );
 	daw::expecting( p2, p2 );
-	 */
+
 }
