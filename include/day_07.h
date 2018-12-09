@@ -26,6 +26,7 @@
 
 #include <daw/daw_algorithm.h>
 #include <daw/daw_graph.h>
+#include <daw/daw_graph_algorithm.h>
 #include <daw/daw_keep_n.h>
 #include <daw/daw_parser_helper_sv.h>
 #include <daw/daw_static_string.h>
@@ -97,29 +98,13 @@ namespace daw {
 		template<size_t N>
 		std::string part_01( std::array<reqs_t, N> const &reqs ) {
 			auto graph = convert_to_graph( reqs );
-
-			auto root_nodes = graph.find(
-			  []( auto const &node ) { return node.incoming_edges( ).empty( ); } );
-
-			std::set<daw::graph_node_t<char>, node_less_by_value> S{};
-			for( auto node_id : root_nodes ) {
-				S.insert( graph.get_node( node_id ) );
-			}
-
-			// Topological Sort.... Khaaaaaaan!!!!!!
 			std::string result{};
-			while( !S.empty( ) ) {
-				auto node = *std::begin( S );
-				S.erase( node );
-				result.push_back( node.value( ) );
-
-				for( auto child : get_sorted_edges( graph, node ) ) {
-					graph.remove_edges( node.id( ), child.id( ) );
-					if( child.incoming_edges( ).empty( ) ) {
-						S.insert( child );
-					}
-				}
-			}
+			daw::topological_sorted_for_each(
+			  graph,
+			  [&result]( auto const &node ) { result.push_back( node.value( ) ); },
+			  []( auto const &lhs, auto const &rhs ) {
+				  return lhs.value( ) < rhs.value( );
+			  } );
 			return result;
 		}
 
