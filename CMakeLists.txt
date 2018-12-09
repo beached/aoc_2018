@@ -61,3 +61,6 @@ target_link_libraries( day_06_test ${CMAKE_DL_LIBS} ${COMPILER_SPECIFIC_LIBS} ${
 add_executable( day_07_test ${HEADER_FOLDER}/day_07.h ${HEADER_FILES} ${TEST_FOLDER}/day_07_test.cpp )
 target_link_libraries( day_07_test ${CMAKE_DL_LIBS} ${COMPILER_SPECIFIC_LIBS} ${CMAKE_THREAD_LIBS_INIT} )
 
+add_executable( day_08_test ${HEADER_FOLDER}/day_08.h ${HEADER_FILES} ${TEST_FOLDER}/day_08_test.cpp )
+target_link_libraries( day_08_test ${CMAKE_DL_LIBS} ${COMPILER_SPECIFIC_LIBS} ${CMAKE_THREAD_LIBS_INIT} )
+
