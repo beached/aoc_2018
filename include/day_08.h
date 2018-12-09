@@ -55,7 +55,7 @@ namespace daw {
 		}
 
 		template<typename CharT>
-		size_t part_02(daw::basic_string_view<CharT> &sv) {
+		size_t part_02(daw::basic_string_view<CharT> &sv ) {
 			auto num_children = get_unsigned<uint8_t>( sv );
 			auto num_meta = get_unsigned<uint8_t>( sv );
 			std::vector<size_t> child_values{};

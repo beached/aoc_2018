@@ -37,17 +37,19 @@ namespace daw {
 } // namespace daw
 
 int main( ) {
-	auto const p1 = *daw::bench_n_test<1>(
+	auto const p1 = *daw::bench_n_test<25>(
 	  "Day 8, part 1",
-	  [sv=daw::aoc_2018::day08::node_data]( ) mutable {
+	  [&]( ) {
+	  	auto sv=daw::aoc_2018::day08::node_data;
 	  	return daw::part_01(sv);
 	  } );
 	daw::expecting( 41028U, p1 );
 
-		auto const p2 = *daw::bench_n_test<1>(
+		auto const p2 = *daw::bench_n_test<25>(
 	  "Day 8, part 2",
-	  [sv=daw::aoc_2018::day08::node_data]( ) mutable {
-	  	return daw::part_02(sv);
+		[&]( ) {
+			auto sv=daw::aoc_2018::day08::node_data;
+	  	return daw::part_02( sv );
 	  } );
-	daw::expecting( p2, p2 );
+	daw::expecting( 20849U, p2 );
 }
