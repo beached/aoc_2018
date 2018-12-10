@@ -50,15 +50,38 @@ namespace daw {
 			return lhs.x != rhs.x or lhs.y != rhs.y;
 		}
 
+		constexpr bool operator<( point_t lhs, point_t rhs ) noexcept {
+			return lhs.y < rhs.y or ( lhs.y == rhs.y and lhs.x < rhs.x );
+		}
+
+		constexpr bool operator>( point_t lhs, point_t rhs ) noexcept {
+			return lhs.y > rhs.y or ( lhs.y == rhs.y and lhs.x > rhs.x );
+		}
+
+		constexpr bool operator<=( point_t lhs, point_t rhs ) noexcept {
+			return lhs < rhs or lhs == rhs;
+		}
+
+		constexpr bool operator>=( point_t lhs, point_t rhs ) noexcept {
+			return lhs > rhs or lhs == rhs;
+		}
+
 		struct light_data_t {
 			point_t position;
 			point_t velocity;
 		};
 
-		constexpr bool operator==( light_data_t const & lhs, light_data_t const & rhs ) noexcept {
+		constexpr bool operator<( light_data_t const &lhs,
+		                           light_data_t const &rhs ) noexcept {
+			return lhs.position < rhs.position;
+		}
+
+		constexpr bool operator==( light_data_t const &lhs,
+		                           light_data_t const &rhs ) noexcept {
 			return lhs.position == rhs.position and lhs.velocity == rhs.velocity;
 		}
-		constexpr bool operator!=( light_data_t const & lhs, light_data_t const & rhs ) noexcept {
+		constexpr bool operator!=( light_data_t const &lhs,
+		                           light_data_t const &rhs ) noexcept {
 			return lhs.position != rhs.position or lhs.velocity != rhs.velocity;
 		}
 
@@ -94,15 +117,17 @@ namespace daw {
 		template<size_t N>
 		constexpr std::array<light_data_t, N>
 		do_tick( std::array<light_data_t, N> data ) {
-			daw::algorithm::transform( begin( data ), end( data ), begin( data ), []( light_data_t ld ) {
-				ld.position.x = ld.position.x + ld.velocity.x;
-				ld.position.y = ld.position.y + ld.velocity.y;
-				return ld;
-			});
+			daw::algorithm::transform(
+			  begin( data ), end( data ), begin( data ), []( light_data_t ld ) {
+				  ld.position.x = ld.position.x + ld.velocity.x;
+				  ld.position.y = ld.position.y + ld.velocity.y;
+				  return ld;
+			  } );
 			return data;
 		}
 
-		constexpr size_t man_distance( light_data_t const & ld_a, light_data_t const & ld_b ) noexcept {
+		constexpr size_t man_distance( light_data_t const &ld_a,
+		                               light_data_t const &ld_b ) noexcept {
 			auto a = ld_a.position;
 			auto b = ld_b.position;
 			if( b.x > a.x ) {
@@ -117,71 +142,79 @@ namespace daw {
 		}
 
 		template<size_t N>
-		auto find_bounding_box( std::array<light_data_t, N> const & arry ) {
+		auto find_bounding_box( std::array<light_data_t, N> const &arry ) {
 			struct bounding_box_t {
 				point_t min_pt;
 				point_t max_pt;
 
-				size_t height() const noexcept {
-					return max_pt.y - min_pt.y;
+				size_t height( ) const noexcept {
+					return static_cast<size_t>( max_pt.y - min_pt.y );
 				}
 
-				size_t width() const noexcept {
-					return max_pt.x - min_pt.x;
+				size_t width( ) const noexcept {
+					return static_cast<size_t>( max_pt.x - min_pt.x );
 				}
 
-				size_t area() const noexcept {
-					return width() * height();
+				size_t area( ) const noexcept {
+					return width( ) * height( );
 				}
 			};
-			bounding_box_t bounding_box { arry[0].position, arry[0].position };
+			bounding_box_t bounding_box{arry[0].position, arry[0].position};
 
-			for( size_t n=1; n<arry.size( ); ++n ) {
-				auto const & pt = arry[n].position;
+			for( size_t n = 1; n < arry.size( ); ++n ) {
+				auto const &pt = arry[n].position;
 				if( pt.x < bounding_box.min_pt.x ) {
-					bounding_box.min_pt.x == pt.x;
+					bounding_box.min_pt.x = pt.x;
 				}
 				if( pt.y < bounding_box.min_pt.y ) {
-					bounding_box.min_pt.y == pt.y;
+					bounding_box.min_pt.y = pt.y;
 				}
 				if( pt.x > bounding_box.max_pt.x ) {
-					bounding_box.max_pt.x == pt.x;
+					bounding_box.max_pt.x = pt.x;
 				}
 				if( pt.y > bounding_box.max_pt.y ) {
-					bounding_box.max_pt.y == pt.y;
+					bounding_box.max_pt.y = pt.y;
 				}
 			}
 			return bounding_box;
 		}
 
 		template<size_t N>
-		std::string part_01( std::array<light_data_t, N> const & arry ) {
-			auto min_box = find_bounding_box( arry );
-			size_t min_box_pos = 0;
-			auto min_tmp = arry;
+		constexpr bool operator<( std::array<light_data_t, N> const & lhs, std::array<light_data_t, N> const & rhs ) {
+			return find_bounding_box( lhs ).area( ) < find_bounding_box( rhs ).area( );
+		}
 
-			auto last_tmp = arry;
-			auto tmp = do_tick( last_tmp );
-			auto new_box = find_bounding_box( tmp );
-			for( size_t count = 2; count < 100'000ULL; ++count ) {
-				if( new_box.area( ) < min_box.area( ) ) {
-					min_box = new_box;
-					min_box_pos = count - 1;
-					min_tmp = tmp;
+		template<size_t N>
+		std::string part_01( std::array<light_data_t, N> const &arry ) {
+			size_t min_box_pos = 0;
+			auto min_data = arry;
+
+			auto data = do_tick( arry );
+			for( size_t count = 1; count < 100'000ULL; ++count ) {
+				if( data < min_data ) {
+					min_box_pos = count;
+					min_data = data;
 				}
-				last_tmp = tmp;
-				tmp = do_tick( tmp );
-				new_box = find_bounding_box( tmp );
+				data = do_tick( data );
 			}
+			std::sort( std::begin( min_data ), std::end( min_data ) );
+			auto bound = find_bounding_box( min_data );
 			std::vector<std::string> result{};
-			result.resize( min_box.height( ), std::string( min_box.width( ), ' ' ) );
-			for( light_data_t const & ld: tmp ) {
-				result[ld.position.y-min_box.min_pt.y][ld.position.x-min_box.min_pt.y] = '#';
+			result.resize( bound.height( ) + 1,
+										 std::string( bound.width( ) + 1, ' ' ) );
+
+			for( light_data_t const &ld : min_data ) {
+				size_t const x =
+				  static_cast<size_t>( ld.position.x - bound.min_pt.x );
+				size_t const y =
+				  static_cast<size_t>( ld.position.y - bound.min_pt.y );
+				result[y][x] = '#';
 			}
 			std::string result_str{};
-			for( auto const & s: result ) {
+			for( auto const &s : result ) {
 				result_str += s + '\n';
 			}
+			result_str += "\nConverged on step: " + std::to_string( min_box_pos ) + '\n';
 			return result_str;
 		}
 	} // namespace
