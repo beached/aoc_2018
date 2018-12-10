@@ -1107,14 +1107,17 @@ namespace daw {
 } // namespace daw
 
 int main( ) {
-	size_t result = *daw::bench_n_test<100>( "Day 4, part 1", [&]( ) {
-		return daw::choose_sleepy_guard( daw::aoc_2018::day04::log_entries );
-	} );
+	size_t result = *daw::bench_n_test<100>(
+	  "Day 4, part 1",
+	  []( auto const &entries ) { return daw::choose_sleepy_guard( entries ); },
+	  daw::aoc_2018::day04::log_entries );
 	daw::expecting( result, 95199U );
 
-	result = *daw::bench_n_test<100>( "Day 4, part 2", [&]( ) {
-		return daw::choose_most_sleepy_on_minute(
-		  daw::aoc_2018::day04::log_entries );
-	} );
+	result = *daw::bench_n_test<100>( "Day 4, part 2",
+	                                  []( auto const &entries ) {
+		                                  return daw::choose_most_sleepy_on_minute(
+		                                    entries );
+	                                  },
+	                                  daw::aoc_2018::day04::log_entries );
 	daw::expecting( result, 7887U );
 }

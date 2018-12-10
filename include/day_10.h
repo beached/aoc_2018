@@ -142,7 +142,8 @@ namespace daw {
 		}
 
 		template<size_t N>
-		constexpr auto find_bounding_box( std::array<light_data_t, N> const &arry ) {
+		constexpr auto
+		find_bounding_box( std::array<light_data_t, N> const &arry ) {
 			struct bounding_box_t {
 				point_t min_pt;
 				point_t max_pt;
@@ -226,7 +227,7 @@ namespace daw {
 		}
 
 		template<typename Result>
-		void display_message( Result const & data ) {
+		void display_message( Result const &data ) {
 			auto const bound = find_bounding_box( data.data );
 			std::vector<std::string> result{};
 			result.resize( bound.height( ) + 1,
@@ -242,7 +243,8 @@ namespace daw {
 				result_str += s + '\n';
 			}
 			result_str +=
-			  "\nConverged on step: " + std::to_string( data.convergence_time ) + '\n';
+			  "\nConverged on step: " + std::to_string( data.convergence_time ) +
+			  '\n';
 			std::cout << result_str;
 		}
 	} // namespace

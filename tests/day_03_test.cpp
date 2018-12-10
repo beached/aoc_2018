@@ -716,9 +716,10 @@ namespace daw {
 
 			template<size_t Runs>
 			void day_03_part_1( ) {
-				auto const result = *daw::bench_n_test<Runs>( "Day 3, part 1", [&]( ) {
-					return calc_conflicted_area( requests );
-				} );
+				auto const result = *daw::bench_n_test<Runs>(
+				  "Day 3, part 1",
+				  []( auto const &reqs ) { return calc_conflicted_area( reqs ); },
+				  requests );
 				daw::expecting( 115242U, result );
 			}
 			// static_assert( calc_conflicted_area( parse_request( request_strs ) ) ==
@@ -726,9 +727,10 @@ namespace daw {
 
 			template<size_t Runs>
 			void day_03_part_2( ) {
-				auto const result = *daw::bench_n_test<Runs>( "Day 3, part 2", [&]( ) {
-					return find_unconflicted_area( requests );
-				} );
+				auto const result = *daw::bench_n_test<Runs>(
+				  "Day 3, part 2",
+				  []( auto const &reqs ) { return find_unconflicted_area( reqs ); },
+				  requests );
 				daw::expecting( 1046U, result );
 			}
 		} // namespace day03

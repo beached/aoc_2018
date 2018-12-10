@@ -34,10 +34,10 @@ int main( ) {
 	daw::expecting( 146373U, test_003 );
 
 	auto const p1 = *daw::bench_n_test<10>(
-	  "Day 9, part 1", [&]( ) { return daw::day_09_solver<459U, 72'103U>( ); } );
+	  "Day 9, part 1", []( ) { return daw::day_09_solver<459U, 72'103U>( ); } );
 	daw::expecting( 388131U, p1 );
 
-	auto const p2 = *daw::bench_n_test<10>( "Day 9, part 2", [&]( ) {
+	auto const p2 = *daw::bench_n_test<10>( "Day 9, part 2", []( ) {
 		return daw::day_09_solver<459U, 7'210'300U>( );
 	} );
 	daw::expecting( 3239376988ULL, p2 );

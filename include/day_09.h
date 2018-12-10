@@ -39,15 +39,13 @@
 namespace daw {
 	namespace {
 		template<size_t PlayerCount, size_t MarbleCount>
-		size_t day_09_solver() {
+		size_t day_09_solver( ) {
 			std::list<size_t> board{};
 			auto board_pos = board.begin( );
 			size_t current_elf = 0;
 			std::array<size_t, PlayerCount> elf_scores{};
 
-			auto get_marble = [cur_marble=0ULL]( ) mutable {
-				return cur_marble++;
-			};
+			auto get_marble = [cur_marble = 0ULL]( ) mutable { return cur_marble++; };
 
 			auto const next = [&]( auto it, size_t count ) {
 				while( count-- > 0 ) {

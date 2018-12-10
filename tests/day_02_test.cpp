@@ -165,14 +165,16 @@ namespace daw {
 
 			void part_01( ) {
 				auto const result = *daw::bench_n_test<100>(
-				  "Day 2, part 1", [&]( ) { return get_checksum( box_ids ); } );
+				  "Day 2, part 1",
+				  []( auto const &ids ) { return get_checksum( ids ); }, box_ids );
 
 				daw::expecting( result, 5880 );
 			}
 
 			void part_02( ) {
 				auto const result = *daw::bench_n_test<100>(
-				  "Day 2, part 2", [&]( ) { return get_match( box_ids ); } );
+				  "Day 2, part 2", []( auto const &ids ) { return get_match( ids ); },
+				  box_ids );
 
 				expecting( result, "tiwcdpbseqhxryfmgkvjujvza" );
 			}

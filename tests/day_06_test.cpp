@@ -51,12 +51,13 @@ namespace daw {
 } // namespace daw
 
 int main( ) {
-	auto const p1 = *daw::bench_n_test<100>( "Day 6, part 1", [&]( ) {
-		return daw::part_01( daw::aoc_2018::day06::grid_pts );
-	} );
+	auto const p1 = *daw::bench_n_test<100>(
+	  "Day 6, part 1", []( auto const &pts ) { return daw::part_01( pts ); },
+	  daw::aoc_2018::day06::grid_pts );
 	daw::expecting( 3687U, p1 );
-	auto const p2 = *daw::bench_n_test<100>( "Day 6, part2", [&]( ) {
-		return daw::part_02<10'000>( daw::aoc_2018::day06::grid_pts );
-	} );
+	auto const p2 = *daw::bench_n_test<100>(
+	  "Day 6, part2",
+	  []( auto const &pts ) { return daw::part_02<10'000>( pts ); },
+	  daw::aoc_2018::day06::grid_pts );
 	daw::expecting( 40134U, p2 );
 }

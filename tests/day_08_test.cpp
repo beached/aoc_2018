@@ -38,18 +38,12 @@ namespace daw {
 
 int main( ) {
 	auto const p1 = *daw::bench_n_test<25>(
-	  "Day 8, part 1",
-	  [&]( ) {
-	  	auto sv=daw::aoc_2018::day08::node_data;
-	  	return daw::part_01(sv);
-	  } );
+	  "Day 8, part 1", []( auto sv ) { return daw::part_01( sv ); },
+	  daw::aoc_2018::day08::node_data );
 	daw::expecting( 41028U, p1 );
 
-		auto const p2 = *daw::bench_n_test<25>(
-	  "Day 8, part 2",
-		[&]( ) {
-			auto sv=daw::aoc_2018::day08::node_data;
-	  	return daw::part_02( sv );
-	  } );
+	auto const p2 = *daw::bench_n_test<25>(
+	  "Day 8, part 2", []( auto sv ) { return daw::part_02( sv ); },
+	  daw::aoc_2018::day08::node_data );
 	daw::expecting( 20849U, p2 );
 }

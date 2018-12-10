@@ -29,36 +29,36 @@ namespace daw {
 	using namespace daw::string_view_literals;
 	static constexpr auto const test_lights = daw::process_data(
 	  std::array<daw::string_view, 31>{"position=< 9,  1> velocity=< 0,  2>",
-	                                    "position=< 7,  0> velocity=<-1,  0>",
-	                                    "position=< 3, -2> velocity=<-1,  1>",
-	                                    "position=< 6, 10> velocity=<-2, -1>",
-	                                    "position=< 2, -4> velocity=< 2,  2>",
-	                                    "position=<-6, 10> velocity=< 2, -2>",
-	                                    "position=< 1,  8> velocity=< 1, -1>",
-	                                    "position=< 1,  7> velocity=< 1,  0>",
-	                                    "position=<-3, 11> velocity=< 1, -2>",
-	                                    "position=< 7,  6> velocity=<-1, -1>",
-	                                    "position=<-2,  3> velocity=< 1,  0>",
-	                                    "position=<-4,  3> velocity=< 2,  0>",
-	                                    "position=<10, -3> velocity=<-1,  1>",
-	                                    "position=< 5, 11> velocity=< 1, -2>",
-	                                    "position=< 4,  7> velocity=< 0, -1>",
-	                                    "position=< 8, -2> velocity=< 0,  1>",
-	                                    "position=<15,  0> velocity=<-2,  0>",
-	                                    "position=< 1,  6> velocity=< 1,  0>",
-	                                    "position=< 8,  9> velocity=< 0, -1>",
-	                                    "position=< 3,  3> velocity=<-1,  1>",
-	                                    "position=< 0,  5> velocity=< 0, -1>",
-	                                    "position=<-2,  2> velocity=< 2,  0>",
-	                                    "position=< 5, -2> velocity=< 1,  2>",
-	                                    "position=< 1,  4> velocity=< 2,  1>",
-	                                    "position=<-2,  7> velocity=< 2, -2>",
-	                                    "position=< 3,  6> velocity=<-1, -1>",
-	                                    "position=< 5,  0> velocity=< 1,  0>",
-	                                    "position=<-6,  0> velocity=< 2,  0>",
-	                                    "position=< 5,  9> velocity=< 1, -2>",
-	                                    "position=<14,  7> velocity=<-2,  0>",
-	                                    "position=<-3,  6> velocity=< 2, -1>"} );
+	                                   "position=< 7,  0> velocity=<-1,  0>",
+	                                   "position=< 3, -2> velocity=<-1,  1>",
+	                                   "position=< 6, 10> velocity=<-2, -1>",
+	                                   "position=< 2, -4> velocity=< 2,  2>",
+	                                   "position=<-6, 10> velocity=< 2, -2>",
+	                                   "position=< 1,  8> velocity=< 1, -1>",
+	                                   "position=< 1,  7> velocity=< 1,  0>",
+	                                   "position=<-3, 11> velocity=< 1, -2>",
+	                                   "position=< 7,  6> velocity=<-1, -1>",
+	                                   "position=<-2,  3> velocity=< 1,  0>",
+	                                   "position=<-4,  3> velocity=< 2,  0>",
+	                                   "position=<10, -3> velocity=<-1,  1>",
+	                                   "position=< 5, 11> velocity=< 1, -2>",
+	                                   "position=< 4,  7> velocity=< 0, -1>",
+	                                   "position=< 8, -2> velocity=< 0,  1>",
+	                                   "position=<15,  0> velocity=<-2,  0>",
+	                                   "position=< 1,  6> velocity=< 1,  0>",
+	                                   "position=< 8,  9> velocity=< 0, -1>",
+	                                   "position=< 3,  3> velocity=<-1,  1>",
+	                                   "position=< 0,  5> velocity=< 0, -1>",
+	                                   "position=<-2,  2> velocity=< 2,  0>",
+	                                   "position=< 5, -2> velocity=< 1,  2>",
+	                                   "position=< 1,  4> velocity=< 2,  1>",
+	                                   "position=<-2,  7> velocity=< 2, -2>",
+	                                   "position=< 3,  6> velocity=<-1, -1>",
+	                                   "position=< 5,  0> velocity=< 1,  0>",
+	                                   "position=<-6,  0> velocity=< 2,  0>",
+	                                   "position=< 5,  9> velocity=< 1, -2>",
+	                                   "position=<14,  7> velocity=<-2,  0>",
+	                                   "position=<-3,  6> velocity=< 2, -1>"} );
 
 	static auto constexpr const lights =
 	  daw::process_data( std::array<daw::string_view, 341>{
@@ -408,37 +408,39 @@ namespace daw {
 	static_assert( find_message( lights ).convergence_time == 10476 );
 } // namespace daw
 
-
 int main( ) {
 	auto const test_result = *daw::bench_n_test<100>(
-	  "Day 10, test data", []( auto const & value ) { return daw::find_message( value ); }, daw::test_lights );
+	  "Day 10, test data",
+	  []( auto const &value ) { return daw::find_message( value ); },
+	  daw::test_lights );
 
 	daw::expecting( 3, test_result.convergence_time );
 	daw::display_message( test_result );
 
-
 	auto const p1 = *daw::bench_n_test<100>(
-	  "Day 10, part 1", []( auto const & value ) { return daw::find_message( value ); }, daw::lights );
+	  "Day 10, part 1",
+	  []( auto const &value ) { return daw::find_message( value ); },
+	  daw::lights );
 
 	daw::expecting( 10476, p1.convergence_time );
 	daw::display_message( p1 );
-/*
- * #####   #        ####   #    #  #    #  #####      ###   ####
- * #    #  #       #    #  ##   #  #    #  #    #      #   #    #
- * #    #  #       #       ##   #  #    #  #    #      #   #
- * #    #  #       #       # #  #  #    #  #    #      #   #
- * #####   #       #       # #  #  ######  #####       #   #
- * #    #  #       #  ###  #  # #  #    #  #           #   #
- * #    #  #       #    #  #  # #  #    #  #           #   #
- * #    #  #       #    #  #   ##  #    #  #       #   #   #
- * #    #  #       #   ##  #   ##  #    #  #       #   #   #    #
- * #####   ######   ### #  #    #  #    #  #        ###     ####
- *
- * Converged on step: 10476
- */
-/*
-	auto const p2 = *daw::bench_n_test<1>(
-	  "Day 10, part 2", [&]( ) { return daw::part_02( ); } );
-	daw::expecting( p2, p2 );
-	*/
+	/*
+	 * #####   #        ####   #    #  #    #  #####      ###   ####
+	 * #    #  #       #    #  ##   #  #    #  #    #      #   #    #
+	 * #    #  #       #       ##   #  #    #  #    #      #   #
+	 * #    #  #       #       # #  #  #    #  #    #      #   #
+	 * #####   #       #       # #  #  ######  #####       #   #
+	 * #    #  #       #  ###  #  # #  #    #  #           #   #
+	 * #    #  #       #    #  #  # #  #    #  #           #   #
+	 * #    #  #       #    #  #   ##  #    #  #       #   #   #
+	 * #    #  #       #   ##  #   ##  #    #  #       #   #   #    #
+	 * #####   ######   ### #  #    #  #    #  #        ###     ####
+	 *
+	 * Converged on step: 10476
+	 */
+	/*
+	  auto const p2 = *daw::bench_n_test<1>(
+	    "Day 10, part 2", [&]( ) { return daw::part_02( ); } );
+	  daw::expecting( p2, p2 );
+	  */
 }
