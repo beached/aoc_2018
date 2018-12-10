@@ -403,7 +403,11 @@ namespace daw {
 	    "position=< 21109, -31312> velocity=<-2,  3>",
 	    "position=<-52224,  52496> velocity=< 5, -5>",
 	    "position=< 10583,  10592> velocity=<-1, -1>"} );
+
+	static_assert( find_message( test_lights ).convergence_time == 3 );
+	static_assert( find_message( lights ).convergence_time == 10476 );
 } // namespace daw
+
 
 int main( ) {
 	auto const test_result = *daw::bench_n_test<1>(
