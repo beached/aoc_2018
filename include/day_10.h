@@ -224,7 +224,6 @@ namespace daw {
 			auto min_data = arry;
 			auto pos_info = test_areas( arry, 0, 100'000 );
 			min_data = do_tick( arry, pos_info.first );
-			std::sort( std::begin( min_data ), std::end( min_data ) );
 			auto bound = find_bounding_box( min_data );
 			std::vector<std::string> result{};
 			result.resize( bound.height( ) + 1,
