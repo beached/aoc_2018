@@ -99,7 +99,7 @@ namespace daw {
 		std::string part_01( std::array<reqs_t, N> const &reqs ) {
 			auto graph = convert_to_graph( reqs );
 			std::string result{};
-			daw::topological_sorted_for_each(
+			daw::topological_sorted_walk(
 			  graph,
 			  [&result]( auto const &node ) { result.push_back( node.value( ) ); },
 			  []( auto const &lhs, auto const &rhs ) {

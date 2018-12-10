@@ -38,8 +38,151 @@
 
 namespace daw {
 	namespace {
-		constexpr size_t part_01( ) {
-			return 0;
+		struct point_t {
+			intmax_t x;
+			intmax_t y;
+		};
+
+		constexpr bool operator==( point_t lhs, point_t rhs ) noexcept {
+			return lhs.x == rhs.x and lhs.y == rhs.y;
+		}
+		constexpr bool operator!=( point_t lhs, point_t rhs ) noexcept {
+			return lhs.x != rhs.x or lhs.y != rhs.y;
+		}
+
+		struct light_data_t {
+			point_t position;
+			point_t velocity;
+		};
+
+		constexpr bool operator==( light_data_t const & lhs, light_data_t const & rhs ) noexcept {
+			return lhs.position == rhs.position and lhs.velocity == rhs.velocity;
+		}
+		constexpr bool operator!=( light_data_t const & lhs, light_data_t const & rhs ) noexcept {
+			return lhs.position != rhs.position or lhs.velocity != rhs.velocity;
+		}
+
+		template<size_t N>
+		std::array<light_data_t, N> constexpr process_data(
+		  std::array<daw::string_view, N> const &arry ) noexcept {
+
+			// "position=< 7,  0> velocity=<-1,  0>"_sv,
+			std::array<light_data_t, N> result{};
+			daw::algorithm::transform(
+			  begin( arry ), end( arry ), result.data( ), []( daw::string_view sv ) {
+				  sv.remove_prefix( 10 );
+				  sv = daw::parser::trim_left( sv );
+				  auto const x = daw::parser::parse_int<intmax_t>(
+				    sv.pop_front( sv.find_first_of( ',' ) ) );
+				  sv.remove_prefix( 1 );
+				  sv = daw::parser::trim_left( sv );
+				  auto const y = daw::parser::parse_int<intmax_t>(
+				    sv.pop_front( sv.find_first_of( '>' ) ) );
+				  sv.remove_prefix( 12 );
+				  sv = daw::parser::trim_left( sv );
+				  auto const dx = daw::parser::parse_int<intmax_t>(
+				    sv.pop_front( sv.find_first_of( ',' ) ) );
+				  sv.remove_prefix( 1 );
+				  sv = daw::parser::trim_left( sv );
+				  auto const dy = daw::parser::parse_int<intmax_t>(
+				    sv.pop_front( sv.find_first_of( '>' ) ) );
+				  return light_data_t{point_t{x, y}, point_t{dx, dy}};
+			  } );
+			return result;
+		}
+
+		template<size_t N>
+		constexpr std::array<light_data_t, N>
+		do_tick( std::array<light_data_t, N> data ) {
+			daw::algorithm::transform( begin( data ), end( data ), begin( data ), []( light_data_t ld ) {
+				ld.position.x = ld.position.x + ld.velocity.x;
+				ld.position.y = ld.position.y + ld.velocity.y;
+				return ld;
+			});
+			return data;
+		}
+
+		constexpr size_t man_distance( light_data_t const & ld_a, light_data_t const & ld_b ) noexcept {
+			auto a = ld_a.position;
+			auto b = ld_b.position;
+			if( b.x > a.x ) {
+				std::swap( b.x, a.x );
+			}
+			if( b.y > a.y ) {
+				std::swap( b.y, a.y );
+			}
+			auto const x = a.x - b.x;
+			auto const y = a.y - b.y;
+			return static_cast<size_t>( x + y );
+		}
+
+		template<size_t N>
+		auto find_bounding_box( std::array<light_data_t, N> const & arry ) {
+			struct bounding_box_t {
+				point_t min_pt;
+				point_t max_pt;
+
+				size_t height() const noexcept {
+					return max_pt.y - min_pt.y;
+				}
+
+				size_t width() const noexcept {
+					return max_pt.x - min_pt.x;
+				}
+
+				size_t area() const noexcept {
+					return width() * height();
+				}
+			};
+			bounding_box_t bounding_box { arry[0].position, arry[0].position };
+
+			for( size_t n=1; n<arry.size( ); ++n ) {
+				auto const & pt = arry[n].position;
+				if( pt.x < bounding_box.min_pt.x ) {
+					bounding_box.min_pt.x == pt.x;
+				}
+				if( pt.y < bounding_box.min_pt.y ) {
+					bounding_box.min_pt.y == pt.y;
+				}
+				if( pt.x > bounding_box.max_pt.x ) {
+					bounding_box.max_pt.x == pt.x;
+				}
+				if( pt.y > bounding_box.max_pt.y ) {
+					bounding_box.max_pt.y == pt.y;
+				}
+			}
+			return bounding_box;
+		}
+
+		template<size_t N>
+		std::string part_01( std::array<light_data_t, N> const & arry ) {
+			auto min_box = find_bounding_box( arry );
+			size_t min_box_pos = 0;
+			auto min_tmp = arry;
+
+			auto last_tmp = arry;
+			auto tmp = do_tick( last_tmp );
+			auto new_box = find_bounding_box( tmp );
+			for( size_t count = 2; count < 100'000ULL; ++count ) {
+				if( new_box.area( ) < min_box.area( ) ) {
+					min_box = new_box;
+					min_box_pos = count - 1;
+					min_tmp = tmp;
+				}
+				last_tmp = tmp;
+				tmp = do_tick( tmp );
+				new_box = find_bounding_box( tmp );
+			}
+			std::vector<std::string> result{};
+			result.resize( min_box.height( ), std::string( min_box.width( ), ' ' ) );
+			for( light_data_t const & ld: tmp ) {
+				result[ld.position.y-min_box.min_pt.y][ld.position.x-min_box.min_pt.y] = '#';
+			}
+			std::string result_str{};
+			for( auto const & s: result ) {
+				result_str += s + '\n';
+			}
+			return result_str;
 		}
 	} // namespace
 } // namespace daw
