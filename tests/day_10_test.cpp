@@ -410,6 +410,7 @@ int main( ) {
 	  "Day 10, test data", [&]( ) { return daw::part_01( daw::test_lights ); } );
 	std::cout << test_result << '\n';
 
+
 	auto const p1 = *daw::bench_n_test<1>(
 	  "Day 10, part 1", [&]( ) { return daw::part_01( daw::lights ); } );
 	std::cout << p1 << '\n';
@@ -424,6 +425,8 @@ int main( ) {
  * #    #  #       #    #  #   ##  #    #  #       #   #   #
  * #    #  #       #   ##  #   ##  #    #  #       #   #   #    #
  * #####   ######   ### #  #    #  #    #  #        ###     ####
+ *
+ * Converged on step: 10476
  */
 /*
 	auto const p2 = *daw::bench_n_test<1>(

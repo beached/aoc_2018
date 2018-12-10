@@ -72,7 +72,7 @@ namespace daw {
 		};
 
 		constexpr bool operator<( light_data_t const &lhs,
-		                           light_data_t const &rhs ) noexcept {
+		                          light_data_t const &rhs ) noexcept {
 			return lhs.position < rhs.position;
 		}
 
@@ -116,11 +116,16 @@ namespace daw {
 
 		template<size_t N>
 		constexpr std::array<light_data_t, N>
-		do_tick( std::array<light_data_t, N> data ) {
+		do_tick( std::array<light_data_t, N> data, size_t num_steps = 1 ) {
 			daw::algorithm::transform(
-			  begin( data ), end( data ), begin( data ), []( light_data_t ld ) {
-				  ld.position.x = ld.position.x + ld.velocity.x;
-				  ld.position.y = ld.position.y + ld.velocity.y;
+			  begin( data ), end( data ), begin( data ),
+			  [num_steps]( light_data_t ld ) {
+				  ld.position.x =
+				    ld.position.x +
+				    ( ld.velocity.x * static_cast<intmax_t>( num_steps ) );
+				  ld.position.y =
+				    ld.position.y +
+				    ( ld.velocity.y * static_cast<intmax_t>( num_steps ) );
 				  return ld;
 			  } );
 			return data;
@@ -180,41 +185,62 @@ namespace daw {
 		}
 
 		template<size_t N>
-		constexpr bool operator<( std::array<light_data_t, N> const & lhs, std::array<light_data_t, N> const & rhs ) {
-			return find_bounding_box( lhs ).area( ) < find_bounding_box( rhs ).area( );
+		constexpr bool operator<( std::array<light_data_t, N> const &lhs,
+		                          std::array<light_data_t, N> const &rhs ) {
+			return find_bounding_box( lhs ).area( ) <
+			       find_bounding_box( rhs ).area( );
+		}
+
+		template<size_t N>
+		std::pair<size_t, size_t>
+		test_areas( std::array<light_data_t, N> const &data, size_t min_pos,
+		            size_t max_pos ) {
+
+			auto range_size = max_pos - min_pos;
+			if( range_size < 6 ) {
+				auto a = find_bounding_box( do_tick( data, min_pos ) ).area( );
+				for( size_t n=min_pos + 1; n<=max_pos; ++n ) {
+					auto b = find_bounding_box( do_tick( data, n ) ).area( );
+					if( b >= a ) {
+						return {n-1, a};
+					}
+					a = b;
+				}
+				return {min_pos, a};
+			}
+
+			auto const mid_pos = min_pos + range_size/2;
+			auto const b0 = find_bounding_box( do_tick( data, mid_pos - 1 ) ).area( );
+			auto const b1 = find_bounding_box( do_tick( data, mid_pos + 1 ) ).area( );
+			auto db = static_cast<intmax_t>( b1 ) - static_cast<intmax_t>( b0 );
+			if( db <= 0 ) {
+				return test_areas( data, mid_pos-1, max_pos );
+			}
+			return test_areas( data, min_pos, mid_pos+1 );
 		}
 
 		template<size_t N>
 		std::string part_01( std::array<light_data_t, N> const &arry ) {
-			size_t min_box_pos = 0;
 			auto min_data = arry;
-
-			auto data = do_tick( arry );
-			for( size_t count = 1; count < 100'000ULL; ++count ) {
-				if( data < min_data ) {
-					min_box_pos = count;
-					min_data = data;
-				}
-				data = do_tick( data );
-			}
+			auto pos_info = test_areas( arry, 0, 100'000 );
+			min_data = do_tick( arry, pos_info.first );
 			std::sort( std::begin( min_data ), std::end( min_data ) );
 			auto bound = find_bounding_box( min_data );
 			std::vector<std::string> result{};
 			result.resize( bound.height( ) + 1,
-										 std::string( bound.width( ) + 1, ' ' ) );
+			               std::string( bound.width( ) + 1, ' ' ) );
 
 			for( light_data_t const &ld : min_data ) {
-				size_t const x =
-				  static_cast<size_t>( ld.position.x - bound.min_pt.x );
-				size_t const y =
-				  static_cast<size_t>( ld.position.y - bound.min_pt.y );
+				size_t const x = static_cast<size_t>( ld.position.x - bound.min_pt.x );
+				size_t const y = static_cast<size_t>( ld.position.y - bound.min_pt.y );
 				result[y][x] = '#';
 			}
 			std::string result_str{};
 			for( auto const &s : result ) {
 				result_str += s + '\n';
 			}
-			result_str += "\nConverged on step: " + std::to_string( min_box_pos ) + '\n';
+			result_str +=
+			  "\nConverged on step: " + std::to_string( pos_info.first ) + '\n';
 			return result_str;
 		}
 	} // namespace
