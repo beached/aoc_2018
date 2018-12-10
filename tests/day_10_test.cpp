@@ -410,15 +410,15 @@ namespace daw {
 
 
 int main( ) {
-	auto const test_result = *daw::bench_n_test<25>(
-	  "Day 10, test data", [&]( ) { return daw::find_message( daw::test_lights ); } );
+	auto const test_result = *daw::bench_n_test<100>(
+	  "Day 10, test data", []( auto const & value ) { return daw::find_message( value ); }, daw::test_lights );
 
 	daw::expecting( 3, test_result.convergence_time );
 	daw::display_message( test_result );
 
 
-	auto const p1 = *daw::bench_n_test<25>(
-	  "Day 10, part 1", [&]( ) { return daw::find_message( daw::lights ); } );
+	auto const p1 = *daw::bench_n_test<100>(
+	  "Day 10, part 1", []( auto const & value ) { return daw::find_message( value ); }, daw::lights );
 
 	daw::expecting( 10476, p1.convergence_time );
 	daw::display_message( p1 );
