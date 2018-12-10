@@ -407,13 +407,17 @@ namespace daw {
 
 int main( ) {
 	auto const test_result = *daw::bench_n_test<1>(
-	  "Day 10, test data", [&]( ) { return daw::part_01( daw::test_lights ); } );
-	std::cout << test_result << '\n';
+	  "Day 10, test data", [&]( ) { return daw::find_message( daw::test_lights ); } );
+
+	daw::expecting( 3, test_result.convergence_time );
+	daw::display_message( test_result );
 
 
 	auto const p1 = *daw::bench_n_test<1>(
-	  "Day 10, part 1", [&]( ) { return daw::part_01( daw::lights ); } );
-	std::cout << p1 << '\n';
+	  "Day 10, part 1", [&]( ) { return daw::find_message( daw::lights ); } );
+
+	daw::expecting( 10476, p1.convergence_time );
+	daw::display_message( p1 );
 /*
  * #####   #        ####   #    #  #    #  #####      ###   ####
  * #    #  #       #    #  ##   #  #    #  #    #      #   #    #
