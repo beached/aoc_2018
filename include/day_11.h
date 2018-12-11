@@ -44,10 +44,12 @@ namespace daw {
 	namespace {
 		using data_t = std::array<std::array<intmax_t, 301>, 301>;
 
-		constexpr intmax_t find_power_level( intmax_t x, intmax_t y,
-		                                     intmax_t sn ) noexcept {
-			auto const rack_id = x + 10LL;
-			auto power_level = rack_id * y;
+		constexpr intmax_t calculate_power_level( size_t x, size_t y,
+		                                          intmax_t sn ) noexcept {
+			intmax_t const _x = static_cast<intmax_t>( x );
+			intmax_t const _y = static_cast<intmax_t>( y );
+			auto const rack_id = _x + 10LL;
+			auto power_level = rack_id * _y;
 			power_level += sn;
 			power_level *= rack_id;
 			power_level /= 100LL;
@@ -55,9 +57,9 @@ namespace daw {
 			power_level -= 5LL;
 			return power_level;
 		}
-		static_assert( find_power_level( 122, 79, 57 ) == -5LL );
-		static_assert( find_power_level( 217, 196, 39 ) == 0LL );
-		static_assert( find_power_level( 3, 5, 8 ) == 4LL );
+		static_assert( calculate_power_level( 122, 79, 57 ) == -5LL );
+		static_assert( calculate_power_level( 217, 196, 39 ) == 0LL );
+		static_assert( calculate_power_level( 3, 5, 8 ) == 4LL );
 
 		struct max_power_t {
 			intmax_t x = 0;
@@ -76,8 +78,7 @@ namespace daw {
 			std::pair<intmax_t, data_t> result( 0, {} );
 			for( size_t y = 1; y <= 300; ++y ) {
 				for( size_t x = 1; x <= 300; ++x ) {
-					auto const tmp = find_power_level( static_cast<intmax_t>( x ),
-					                                   static_cast<intmax_t>( y ), sn );
+					auto const tmp = calculate_power_level( x, y, sn );
 					result.first += tmp;
 					result.second[y][x] = tmp;
 				}
@@ -96,37 +97,53 @@ namespace daw {
 			return row_prefix_sum;
 		}
 
-		constexpr intmax_t find_sum( size_t x, size_t y, size_t sz,
-		                             data_t const &row_prefix_sum ) {
-			// x-1 is always fine because the prefix rows start at 0, we don't use
-			// column 0 or row 0
-			auto const max_y = y + sz;
-			intmax_t result = 0;
-			for( size_t py = y; py < max_y; ++py ) {
-				auto const left = row_prefix_sum[py][x - 1];
-				auto const right = row_prefix_sum[py][x + sz - 1];
-				result += right - left;
+		constexpr data_t build_summed_area_table( intmax_t sn ) noexcept {
+			data_t result{};
+			for( size_t y = 1U; y <= 300U; ++y ) {
+				for( size_t x = 1U; x <= 300U; ++x ) {
+					auto const power_level = calculate_power_level( x, y, sn );
+					auto const RYXm1 = result[y][x - 1];
+					auto const RYm1X = result[y - 1][x];
+					auto const RYm1Xm1 = result[y - 1][x - 1];
+					result[y][x] = power_level + RYXm1 + RYm1X - RYm1Xm1;
+				}
 			}
 			return result;
+		}
+
+		constexpr intmax_t find_sum( size_t x, size_t y, size_t sz,
+		                             data_t const &summed_area_table ) noexcept {
+			/*
+			A # B #
+			# @ @ #
+			D @ C #
+			# # # #
+			 Need Sum = C + A - (B + D)
+			*/
+			auto const max_x = x + sz - 1;
+			auto const max_y = y + sz - 1;
+			auto const A = summed_area_table[y - 1][x - 1];
+			auto const B = summed_area_table[y - 1][max_x];
+			auto const C = summed_area_table[max_y][max_x];
+			auto const D = summed_area_table[max_y][x - 1];
+			return ( A + C ) - ( B + D );
 		}
 
 		template<size_t MinSize = 1ULL, size_t MaxSize = 300ULL>
 		constexpr max_power_t largest_subset_sum( intmax_t sn ) noexcept {
 			max_power_t max_power{};
-			auto const all_power_levels = get_all_powerlevels( sn );
-			max_power.power_level = all_power_levels.first;
+			max_power.power_level = calculate_power_level( 1, 1, sn );
 			max_power.x = 1;
 			max_power.y = 1;
-			max_power.size = 300;
+			max_power.size = 1;
 
-			data_t row_prefix_sum =
-			  build_row_prefix_sum_table( all_power_levels.second );
-
+			data_t const summed_area_table = build_summed_area_table( sn );
 			for( size_t sz = MinSize; sz <= MaxSize; ++sz ) {
 				auto const max_idx = 300ULL - sz;
 				for( size_t y = 1ULL; y <= max_idx; ++y ) {
 					for( size_t x = 1ULL; x <= max_idx; ++x ) {
-						auto const tmp = find_sum( x, y, sz, row_prefix_sum );
+						auto const tmp =
+						  find_sum( x, y, sz, summed_area_table ); // row_prefix_sum );
 						if( tmp > max_power.power_level ) {
 							max_power.power_level = tmp;
 							max_power.x = static_cast<intmax_t>( x );
@@ -143,6 +160,6 @@ namespace daw {
 			return largest_subset_sum<3, 3>( sn );
 		}
 		// Cannot enable, too many steps
-		//static_assert( part_01( 9302 ) == max_power_t{ 235U, 38U, 30, 3U } );
+		// static_assert( part_01( 9302 ) == max_power_t{ 235U, 38U, 30, 3U } );
 	} // namespace
 } // namespace daw
