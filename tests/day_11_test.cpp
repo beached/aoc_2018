@@ -31,7 +31,7 @@ namespace daw {
 } // namespace daw
 
 int main( ) {
-	intmax_t p1_sn = 9306;
+	daw::value_t p1_sn = 9306;
 
 	auto const p1 = *daw::bench_n_test<100>(
 	  "Day 11, p1", []( auto const &value ) { return daw::part_01( value ); },
