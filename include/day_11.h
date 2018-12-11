@@ -66,6 +66,12 @@ namespace daw {
 			size_t size = 0;
 		};
 
+		constexpr bool operator==( max_power_t const &lhs,
+		                           max_power_t const &rhs ) noexcept {
+			return std::tie( rhs.x, rhs.y, rhs.power_level, rhs.size ) ==
+			       std::tie( rhs.x, rhs.y, rhs.power_level, rhs.size );
+		}
+
 		constexpr auto get_all_powerlevels( intmax_t sn ) noexcept {
 			std::pair<intmax_t, data_t> result( 0, {} );
 			for( size_t y = 1; y <= 300; ++y ) {
@@ -116,10 +122,10 @@ namespace daw {
 			data_t row_prefix_sum =
 			  build_row_prefix_sum_table( all_power_levels.second );
 
-			for( size_t x = 1ULL; x < 300ULL; ++x ) {
-				for( size_t y = 1ULL; y < 300ULL; ++y ) {
-					auto const max_sz = daw::min( MaxSize, 300ULL - std::max( x, y ) );
-					for( size_t sz = MinSize; sz < max_sz; ++sz ) {
+			for( size_t sz = MinSize; sz <= MaxSize; ++sz ) {
+				auto const max_idx = 300ULL - sz;
+				for( size_t y = 1ULL; y <= max_idx; ++y ) {
+					for( size_t x = 1ULL; x <= max_idx; ++x ) {
 						auto const tmp = find_sum( x, y, sz, row_prefix_sum );
 						if( tmp > max_power.power_level ) {
 							max_power.power_level = tmp;
@@ -134,7 +140,9 @@ namespace daw {
 		}
 
 		constexpr max_power_t part_01( intmax_t sn ) noexcept {
-			return largest_subset_sum<3, 4>( sn );
+			return largest_subset_sum<3, 3>( sn );
 		}
+		// Cannot enable, too many steps
+		//static_assert( part_01( 9302 ) == max_power_t{ 235U, 38U, 30, 3U } );
 	} // namespace
 } // namespace daw
