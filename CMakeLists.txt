@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 project( aoc_2018 )
 
 find_package( Boost 1.58.0 COMPONENTS system iostreams filesystem regex unit_test_framework REQUIRED )
-
+find_package( Threads )
 include( "${CMAKE_SOURCE_DIR}/dependent_projects/CMakeListsCompiler.txt" )
 
 add_definitions( -DBOOST_TEST_DYN_LINK -DBOOST_ALL_NO_LIB -DBOOST_ALL_DYN_LINK )
@@ -10,14 +10,14 @@ add_definitions( -DBOOST_TEST_DYN_LINK -DBOOST_ALL_NO_LIB -DBOOST_ALL_DYN_LINK )
 if( EXISTS "${CMAKE_SOURCE_DIR}/dependent_projects/build" )
 	add_custom_target( dependency_stub )
 	include_directories( SYSTEM "${CMAKE_SOURCE_DIR}/dependent_projects/build/install/include" )
-	#	link_directories( "${CMAKE_SOURCE_DIR}/dependent_projects/build/install/lib" )
+	link_directories( "${CMAKE_SOURCE_DIR}/dependent_projects/build/install/lib" )
 else( )
 	set( SHOULD_BUILD_DEPS ON )
 	include( "${CMAKE_SOURCE_DIR}/dependent_projects/dependencies.txt" )
 
 	add_library( dependency_stub STATIC "${CMAKE_SOURCE_DIR}/dependent_projects/stub.cpp" )
-	add_dependencies( dependency_stub header_libraries_prj date_prj )
-include_directories( SYSTEM "${CMAKE_BINARY_DIR}/install/include" )
+ 	add_dependencies( dependency_stub function_stream_prj header_libraries_prj date_prj )
+  include_directories( SYSTEM "${CMAKE_BINARY_DIR}/install/include" )
 endif( )
 
 set( HEADER_FOLDER "include" )
@@ -81,6 +81,6 @@ target_link_libraries( day_10_test ${CMAKE_DL_LIBS} ${COMPILER_SPECIFIC_LIBS} ${
 add_dependencies( day_10_test dependency_stub )
 
 add_executable( day_11_test ${HEADER_FOLDER}/day_11.h ${HEADER_FILES} ${TEST_FOLDER}/day_11_test.cpp )
-target_link_libraries( day_11_test ${CMAKE_DL_LIBS} ${COMPILER_SPECIFIC_LIBS} ${CMAKE_THREAD_LIBS_INIT} )
+target_link_libraries( day_11_test task_scheduler_lib ${CMAKE_DL_LIBS} ${COMPILER_SPECIFIC_LIBS} ${CMAKE_THREAD_LIBS_INIT} )
 add_dependencies( day_11_test dependency_stub )
 
