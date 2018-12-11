@@ -29,6 +29,7 @@
 #include <unordered_map>
 
 #include <daw/daw_algorithm.h>
+#include <daw/daw_static_string.h>
 #include <daw/daw_traits.h>
 
 namespace daw {
@@ -74,9 +75,10 @@ namespace daw {
 		return two_of_same * three_of_same;
 	}
 
-	template<typename Container>
-	std::string get_match( Container &&ids ) {
+	template<size_t N>
+	auto get_match( std::array<daw::string_view, N> const & ids ) {
 		std::string result{};
+//		daw::static_string result{};
 		for( size_t n = 0; n < ids.size( ); ++n ) {
 			for( size_t m = n + 1; m < ids.size( ); ++m ) {
 				uint_fast8_t sum = 0;
