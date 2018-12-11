@@ -36,10 +36,13 @@ int main( ) {
 	auto const p1 =
 	  *daw::bench_n_test<1>( "Day 11, p1", []( auto const & value ) { return daw::part_01( value ); }, p1_sn );
 
-	daw::expecting( p1.first == 235 and p1.second == 38 );
-
+	daw::expecting( p1.x == 235 and p1.y == 38 );
+			std::cout << "max power: " << p1.power_level << '\n';
+			std::cout << "max_x: " << p1.x << '\n';
+			std::cout << "max_y: " << p1.y << '\n';
+			std::cout << "size: " << p1.size << '\n';
 	auto const p2 =
-			*daw::bench_n_test<1>( "Day 11, p2", []( auto const & value ) { return daw::part_02( value ); }, p1_sn );
+			*daw::bench_n_test<1>( "Day 11, p2", []( auto const & value ) { return daw::largest_subset_sum( value ); }, p1_sn );
 
 			std::cout << "max power: " << p2.power_level << '\n';
 			std::cout << "max_x: " << p2.x << '\n';
