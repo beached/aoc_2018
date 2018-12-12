@@ -110,10 +110,6 @@ namespace daw {
 		template<size_t MinSize = 1U, size_t MaxSize = 300U>
 		constexpr max_power_t largest_subset_sum( value_t sn ) noexcept {
 			max_power_t max_power{};
-			max_power.power_level = calculate_power_level( 1, 1, sn );
-			max_power.x = 1;
-			max_power.y = 1;
-			max_power.size = 1;
 
 			data_t const summed_area_table = build_summed_area_table( sn );
 			for( size_t sz = MinSize; sz <= MaxSize; ++sz ) {
