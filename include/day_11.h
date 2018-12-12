@@ -45,9 +45,10 @@ namespace daw {
 		using value_t = int32_t;
 		using data_t = std::array<std::array<value_t, 301>, 301>;
 
-		constexpr value_t calculate_power_level(size_t y, size_t x, value_t sn) noexcept {
-			value_t const _x = static_cast<value_t>( x );
-			value_t const _y = static_cast<value_t>( y );
+		constexpr value_t calculate_power_level( size_t y, size_t x,
+		                                         value_t sn ) noexcept {
+			auto const _x = static_cast<value_t>( x );
+			auto const _y = static_cast<value_t>( y );
 			auto const rack_id = _x + 10;
 			auto power_level = rack_id * _y;
 			power_level += sn;
@@ -57,9 +58,9 @@ namespace daw {
 			power_level -= 5;
 			return power_level;
 		}
-		static_assert(calculate_power_level(79, 122, 57) == -5 );
-		static_assert(calculate_power_level(196, 217, 39) == 0 );
-		static_assert(calculate_power_level(5, 3, 8) == 4 );
+		static_assert( calculate_power_level( 79, 122, 57 ) == -5 );
+		static_assert( calculate_power_level( 196, 217, 39 ) == 0 );
+		static_assert( calculate_power_level( 5, 3, 8 ) == 4 );
 
 		struct max_power_t {
 			size_t size = 0;
@@ -78,7 +79,7 @@ namespace daw {
 			data_t result{};
 			for( size_t y = 1U; y <= 300U; ++y ) {
 				for( size_t x = 1U; x <= 300U; ++x ) {
-					auto const power_level = calculate_power_level(y, x, sn);
+					auto const power_level = calculate_power_level( y, x, sn );
 					auto const RYXm1 = result[y][x - 1];
 					auto const RYm1X = result[y - 1][x];
 					auto const RYm1Xm1 = result[y - 1][x - 1];
@@ -88,7 +89,8 @@ namespace daw {
 			return result;
 		}
 
-		constexpr value_t find_sum(size_t y, size_t x, size_t sz, data_t const &summed_area_table) noexcept {
+		constexpr value_t find_sum( size_t y, size_t x, size_t sz,
+		                            data_t const &summed_area_table ) noexcept {
 			/*
 			A # B #
 			# @ @ #
@@ -114,7 +116,7 @@ namespace daw {
 				for( size_t y = 1U; y <= max_idx; ++y ) {
 					for( size_t x = 1U; x <= max_idx; ++x ) {
 						auto const tmp =
-								find_sum(y, x, sz, summed_area_table); // row_prefix_sum );
+						  find_sum( y, x, sz, summed_area_table ); // row_prefix_sum );
 						if( tmp > max_power.power_level ) {
 							max_power.power_level = tmp;
 							max_power.x = static_cast<value_t>( x );
