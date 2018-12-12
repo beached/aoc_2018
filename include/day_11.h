@@ -63,10 +63,10 @@ namespace daw {
 		static_assert( calculate_power_level( 3, 5, 8 ) == 4 );
 
 		struct max_power_t {
+			size_t size = 0;
 			value_t x = 0;
 			value_t y = 0;
 			value_t power_level = std::numeric_limits<value_t>::min( );
-			size_t size = 0;
 		};
 
 		constexpr bool operator==( max_power_t const &lhs,
@@ -110,8 +110,6 @@ namespace daw {
 		template<size_t MinSize = 1U, size_t MaxSize = 300U>
 		constexpr max_power_t largest_subset_sum( value_t sn ) noexcept {
 			max_power_t max_power{};
-			std::array<size_t, 301> nums{};
-			daw::algorithm::iota( nums.begin( ), nums.end( ), 0 );
 			data_t const summed_area_table = build_summed_area_table( sn );
 			for( size_t sz = MinSize; sz <= MaxSize; ++sz ) {
 				auto const max_idx = 300U - sz;
