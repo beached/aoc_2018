@@ -33,7 +33,7 @@ namespace daw {
 int main( ) {
 	daw::value_t p1_sn = 9306;
 
-	auto const p1 = *daw::bench_n_test<100>(
+	auto const p1 = *daw::bench_n_test<1000>(
 	  "Day 11, p1", []( auto const &value ) { return daw::part_01( value ); },
 	  p1_sn );
 
@@ -43,7 +43,7 @@ int main( ) {
 	std::cout << "max power: " << p1.power_level << '\n';
 	std::cout << "position: (" << p1.x << ", " << p1.y << ")\n";
 	std::cout << "size: " << p1.size << '\n';
-	auto const p2 = *daw::bench_n_test<100>(
+	auto const p2 = *daw::bench_n_test<1000>(
 	  "Day 11, p2",
 	  []( auto const &value ) { return daw::largest_subset_sum( value ); },
 	  p1_sn );

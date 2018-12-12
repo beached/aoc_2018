@@ -69,12 +69,6 @@ namespace daw {
 			value_t power_level = std::numeric_limits<value_t>::min( );
 		};
 
-		constexpr bool operator==( max_power_t const &lhs,
-		                           max_power_t const &rhs ) noexcept {
-			return std::tie( rhs.x, rhs.y, rhs.power_level, rhs.size ) ==
-			       std::tie( rhs.x, rhs.y, rhs.power_level, rhs.size );
-		}
-
 		constexpr data_t build_summed_area_table( value_t sn ) noexcept {
 			data_t result{};
 			for( size_t y = 1U; y <= 300U; ++y ) {
@@ -132,7 +126,5 @@ namespace daw {
 		constexpr max_power_t part_01( value_t sn ) noexcept {
 			return largest_subset_sum<3, 3>( sn );
 		}
-		// Cannot enable, too many steps
-		// static_assert( part_01( 9302 ) == max_power_t{ 235U, 38U, 30, 3U } );
 	} // namespace
 } // namespace daw
