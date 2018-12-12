@@ -84,3 +84,7 @@ add_executable( day_11_test ${HEADER_FOLDER}/day_11.h ${HEADER_FILES} ${TEST_FOL
 target_link_libraries( day_11_test task_scheduler_lib ${CMAKE_DL_LIBS} ${COMPILER_SPECIFIC_LIBS} ${CMAKE_THREAD_LIBS_INIT} )
 add_dependencies( day_11_test dependency_stub )
 
+add_executable( day_12_test ${HEADER_FOLDER}/day_11.h ${HEADER_FILES} ${TEST_FOLDER}/day_11_test.cpp )
+target_link_libraries( day_12_test task_scheduler_lib ${CMAKE_DL_LIBS} ${COMPILER_SPECIFIC_LIBS} ${CMAKE_THREAD_LIBS_INIT} )
+add_dependencies( day_12_test dependency_stub )
+
