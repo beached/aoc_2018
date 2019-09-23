@@ -25,79 +25,121 @@
 #include <algorithm>
 #include <array>
 #include <cstdint>
+#include <future>
+#include <iostream>
 #include <iterator>
 #include <list>
 #include <set>
+#include <tuple>
 
-#include <daw/daw_algorithm.h>
+#include <daw/daw_graph.h>
+#include <daw/daw_hash_adaptor.h>
 #include <daw/daw_keep_n.h>
 #include <daw/daw_parser_helper_sv.h>
 #include <daw/daw_static_string.h>
 #include <daw/daw_string_view.h>
 #include <daw/daw_traits.h>
+#include <daw/daw_tuple_helper.h>
+#include <daw/fs/algorithms.h>
 
 namespace daw {
 	namespace {
-		template<size_t PlayerCount, size_t MarbleCount>
-		size_t day_09_solver( ) {
-			std::list<size_t> board{};
-			auto board_pos = board.begin( );
-			size_t current_elf = 0;
-			std::array<size_t, PlayerCount> elf_scores{};
+		struct route_t {
+			daw::string_view from;
+			daw::string_view to;
+			size_t distance;
+		};
 
-			auto get_marble = [cur_marble = 0ULL]( ) mutable { return cur_marble++; };
+		constexpr route_t parse_route( daw::string_view sv_route ) noexcept {
+			auto from = sv_route.pop_front( sv_route.find_first_of( ' ' ) );
+			sv_route.remove_prefix( 4 );
+			auto to = sv_route.pop_front( sv_route.find_first_of( ' ' ) );
+			sv_route.remove_prefix( 3 );
+			auto dist = daw::parser::parse_unsigned_int<size_t>( sv_route );
+			return {from, to, dist};
+		}
 
-			auto const next = [&]( auto it, size_t count ) {
-				while( count-- > 0 ) {
-					++it;
-					if( it == std::end( board ) ) {
-						it = std::begin( board );
-					}
+		template<size_t N>
+		daw::graph<daw::string_view> parse_input(
+		  std::array<daw::string_view, N> const &sv_locations ) noexcept {
+			daw::hash_adaptor_t<daw::string_view> location_counter( N );
+			for( auto sv: sv_locations ) {
+				auto result = parse_route( sv );
+				location_set.insert( result.from )
+				location_set.insert( result.to )
+			};
+			daw::graph<daw::string_view> graph{};
+			daw::hash_adaptor_t<daw::string_view
+			return result;
+		}
+
+		template<size_t N, typename Compare = std::less<>>
+		constexpr auto make_graph( size_t sz, Compare comp = Compare{} ) noexcept {
+			daw::fixed_stack_t<daw::fixed_stack_t<size_t, N>, N> graph{};
+			auto const MaxValue =
+			  std::max( std::numeric_limits<size_t>::min( ),
+			            std::numeric_limits<size_t>::max( ), comp );
+			for( size_t n = 0; n < sz; ++n ) {
+				graph.emplace_back( );
+				for( size_t m = 0; m < sz; ++m ) {
+					graph[n].push_back( MaxValue );
 				}
-				return it;
-			};
-
-			auto const prev = [&]( auto it, size_t count ) {
-				while( count-- > 0 ) {
-					if( it == std::begin( board ) ) {
-						it = std::end( board );
-					}
-					--it;
-				}
-				return it;
-			};
-
-			auto const place_marble = [&]( size_t m ) {
-				board_pos = board.insert( next( board_pos, 2 ), m );
-			};
-
-			board.push_back( get_marble( ) );
-
-			auto const mod_23 = [&]( auto it, size_t m ) {
-				it = prev( it, 7 );
-				elf_scores[current_elf] += m + *it;
-				it = board.erase( it );
-				return it;
-			};
-
-			auto m = get_marble( );
-			while( m <= MarbleCount ) {
-				if( m % 23 == 0 ) {
-					current_elf %= PlayerCount;
-					board_pos = mod_23( board_pos, m );
-				} else {
-					place_marble( m );
-				}
-				++current_elf;
-				m = get_marble( );
 			}
-			return *std::max_element( begin( elf_scores ), end( elf_scores ) );
+			return graph;
 		}
 
-		template<typename CharT>
-		auto part_02( daw::basic_string_view<CharT> sv ) {
-			return 0;
+		template<size_t N, typename ProbInput, typename Compare = std::less<>>
+		constexpr auto make_dist_graph( ProbInput const &prob_input,
+		                                Compare comp = Compare{} ) noexcept {
+			auto dist_graph =
+			  make_graph<N>( prob_input.location_names.size( ), comp );
+			for( auto const &route : prob_input.routes ) {
+				auto pos0 = static_cast<size_t>( std::distance(
+				  begin( prob_input.location_names ),
+				  std::find( begin( prob_input.location_names ),
+				             end( prob_input.location_names ), route.from ) ) );
+
+				auto pos1 = static_cast<size_t>( std::distance(
+				  begin( prob_input.location_names ),
+				  std::find( begin( prob_input.location_names ),
+				             end( prob_input.location_names ), route.to ) ) );
+
+				dist_graph[pos0][pos1] = route.distance;
+				dist_graph[pos1][pos0] = route.distance;
+			}
+
+			return dist_graph;
 		}
 
+		template<size_t N, typename ProbInput, typename Graph,
+		         typename Compare = std::less<>>
+		constexpr size_t find_shortest( size_t start, ProbInput const &prob_input,
+		                                Graph const &graph,
+		                                Compare comp = Compare{} ) noexcept {
+			daw::static_hash_adaptor_t<size_t, N> visited{};
+			daw::fixed_stack_t<size_t, N> path{};
+			path.push_back( start );
+			size_t depth = 0;
+			auto cur_cost = std::min( 0, std::numeric_limits<size_t>::max( ), comp );
+			daw::fixed_stack_t<size_t, N> min_path{};
+			while( !path.empty( ) ) {
+				++depth;
+				auto current_node = path.back( );
+				path.pop_back( );
+				if( )
+					for( size_t n = )
+			}
+		}
+
+		return 0;
 	} // namespace
+
+	template<size_t N>
+	constexpr size_t part_01( std::array<daw::string_view, N> const &routes ) {
+		auto const prob_input = parse_input( routes );
+		auto const dist_graph = make_dist_graph<N>( prob_input );
+		Unused( dist_graph );
+		return 0;
+	}
+} // namespace daw
 } // namespace daw

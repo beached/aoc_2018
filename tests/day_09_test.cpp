@@ -25,20 +25,46 @@
 
 #include "day_09.h"
 
+namespace daw {
+	using namespace daw::string_view_literals;
+	static auto const init_state =
+	  std::array<daw::string_view, 28> {"AlphaCentauri to Snowdin = 66",
+	                                      "AlphaCentauri to Tambi = 28",
+	                                      "AlphaCentauri to Faerun = 60",
+	                                      "AlphaCentauri to Norrath = 34",
+	                                      "AlphaCentauri to Straylight = 34",
+	                                      "AlphaCentauri to Tristram = 3",
+	                                      "AlphaCentauri to Arbre = 108",
+	                                      "Snowdin to Tambi = 22",
+	                                      "Snowdin to Faerun = 12",
+	                                      "Snowdin to Norrath = 91",
+	                                      "Snowdin to Straylight = 121",
+	                                      "Snowdin to Tristram = 111",
+	                                      "Snowdin to Arbre = 71",
+	                                      "Tambi to Faerun = 39",
+	                                      "Tambi to Norrath = 113",
+	                                      "Tambi to Straylight = 130",
+	                                      "Tambi to Tristram = 35",
+	                                      "Tambi to Arbre = 40",
+	                                      "Faerun to Norrath = 63",
+	                                      "Faerun to Straylight = 21",
+	                                      "Faerun to Tristram = 57",
+	                                      "Faerun to Arbre = 83",
+	                                      "Norrath to Straylight = 9",
+	                                      "Norrath to Tristram = 50",
+	                                      "Norrath to Arbre = 60",
+	                                      "Straylight to Tristram = 27",
+	                                      "Straylight to Arbre = 81",
+	                                      "Tristram to Arbre = 90" };
+} // namespace daw
+
 int main( ) {
-	auto test_001 = daw::day_09_solver<9U, 25U>( );
-	daw::expecting( 32U, test_001 );
-	auto test_002 = daw::day_09_solver<10U, 1618U>( );
-	daw::expecting( 8317U, test_002 );
-	auto test_003 = daw::day_09_solver<13U, 7999U>( );
-	daw::expecting( 146373U, test_003 );
-
-	auto const p1 = *daw::bench_n_test<10>(
-	  "Day 9, part 1", []( ) { return daw::day_09_solver<459U, 72'103U>( ); } );
-	daw::expecting( 388131U, p1 );
-
-	auto const p2 = *daw::bench_n_test<10>( "Day 9, part 2", []( ) {
-		return daw::day_09_solver<459U, 7'210'300U>( );
-	} );
-	daw::expecting( 3239376988ULL, p2 );
+	auto const p1 = *daw::bench_n_test<1>(
+	  "Day 09, p1",
+	  []( auto const &value ) {
+	  	return daw::part_01( value );
+	  },
+	  daw::init_state );
+	std::cout << "Part 1: " << p1 << '\n';
+	daw::expecting( p1, p1 );
 }
